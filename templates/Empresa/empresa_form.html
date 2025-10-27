@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{% if object %}Editar Empresa{% else %}Crear Nueva Empresa{% endif %}</title>
+    <style>
+        body { font-family: sans-serif; margin: 2em; }
+        form p { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input, select, textarea { width: 300px; padding: 5px; }
+        button { padding: 10px 15px; background-color: #28a745; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #218838; }
+    </style>
+</head>
+<body>
+    <h1>{% if object %}Editar Empresa: {{ object.razon_social }}{% else %}Crear Nueva Empresa{% endif %}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Guardar</button>
+    </form>
+    <br>
+    <a href="{% if object %}{% url 'empresa-detail' object.pk %}{% else %}{% url 'empresa-list' %}{% endif %}">Cancelar</a>
+</body>
+</html>

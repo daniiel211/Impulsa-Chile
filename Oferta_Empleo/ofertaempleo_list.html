@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ofertas de Empleo</title>
+    <style>
+        body { font-family: sans-serif; margin: 2em; }
+        a { text-decoration: none; color: #007bff; }
+        a:hover { text-decoration: underline; }
+        ul { list-style-type: none; padding: 0; }
+        li { margin-bottom: 10px; border: 1px solid #ddd; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Ofertas de Empleo</h1>
+    <p><a href="{% url 'ofertaempleo-create' %}">Publicar Nueva Oferta</a></p>
+    <ul>
+        {% for oferta in ofertas %}
+            <li>
+                <a href="{% url 'ofertaempleo-detail' oferta.pk %}"><strong>{{ oferta.titulo }}</strong></a> en {{ oferta.empresa.razon_social }}
+                <br><small>{{ oferta.region }} | {{ oferta.get_estado_display }}</small>
+            </li>
+        {% empty %}
+            <li>No hay ofertas de empleo publicadas.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Listado de Empresas</title>
+    <style>
+        body { font-family: sans-serif; margin: 2em; }
+        a { text-decoration: none; color: #007bff; }
+        a:hover { text-decoration: underline; }
+        ul { list-style-type: none; padding: 0; }
+        li { margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Listado de Empresas</h1>
+    <p><a href="{% url 'empresa-create' %}">Registrar Nueva Empresa</a></p>
+    <ul>
+        {% for empresa in empresas %}
+            <li>
+                <a href="{% url 'empresa-detail' empresa.pk %}">{{ empresa.razon_social }}</a>
+                - <a href="{% url 'empresa-update' empresa.pk %}">Editar</a>
+                - <a href="{% url 'empresa-delete' empresa.pk %}">Eliminar</a>
+            </li>
+        {% empty %}
+            <li>No hay empresas registradas.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

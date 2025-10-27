@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle de {{ object.razon_social }}</title>
+    <style>
+        body { font-family: sans-serif; margin: 2em; }
+        a { text-decoration: none; color: #007bff; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>{{ object.razon_social }}</h1>
+    <p><strong>RUT:</strong> {{ object.rut }}</p>
+    <p><strong>Industria:</strong> {{ object.industria.nombre_industria|default:"No especificada" }}</p>
+    <p><strong>Descripción:</strong></p>
+    <p>{{ object.descripcion|linebreaksbr|default:"Sin descripción." }}</p>
+    <p><strong>Usuario asociado:</strong> {{ object.usuario.username }}</p>
+
+    <hr>
+
+    <a href="{% url 'empresa-update' object.pk %}">Editar</a> |
+    <a href="{% url 'empresa-delete' object.pk %}">Eliminar</a> |
+    <a href="{% url 'empresa-list' %}">Volver al listado</a>
+</body>
+</html>

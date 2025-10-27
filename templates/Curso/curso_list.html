@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Listado de Cursos</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        margin: 2em;
+      }
+      a {
+        text-decoration: none;
+        color: #007bff;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      ul {
+        list-style-type: none;
+        padding: 0;
+      }
+      li {
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Listado de Cursos</h1>
+    <p><a href="{% url 'curso-create' %}">Crear Nuevo Curso</a></p>
+    <ul>
+      {% for curso in cursos %}
+      <li>
+        <a href="{% url 'curso-detail' curso.pk %}">{{ curso.titulo }}</a>
+        - <a href="{% url 'curso-update' curso.pk %}">Editar</a> -
+        <a href="{% url 'curso-delete' curso.pk %}">Eliminar</a>
+      </li>
+      {% empty %}
+      <li>No hay cursos registrados.</li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>

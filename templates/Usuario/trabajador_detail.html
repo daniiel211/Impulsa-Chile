@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Perfil de {{ object.usuario.username }}</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        margin: 2em;
+      }
+      a {
+        text-decoration: none;
+        color: #007bff;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>
+      Perfil de {{ object.usuario.first_name }} {{ object.usuario.last_name }}
+      ({{ object.usuario.username }})
+    </h1>
+
+    <h2>Resumen Profesional</h2>
+    <p>
+      {{ object.resumen_profesional|linebreaksbr|default:"No hay un resumen
+      profesional disponible." }}
+    </p>
+
+    <h2>Habilidades</h2>
+    <ul>
+      {% for habilidad in object.habilidades.all %}
+      <li>{{ habilidad.nombre_habilidad }}</li>
+      {% empty %}
+      <li>No se han registrado habilidades.</li>
+      {% endfor %}
+    </ul>
+
+    {% if object.cv %}
+    <p>
+      <a href="{{ object.cv.url }}" target="_blank">Ver Currículum (PDF)</a>
+    </p>
+    {% endif %}
+
+    <hr />
+    <a href="{% url 'trabajador-update' object.pk %}">Editar Perfil</a> |
+    <a href="{% url 'trabajador-list' %}">Volver al listado</a>
+  </body>
+</html>

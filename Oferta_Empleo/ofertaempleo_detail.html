@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle de Oferta: {{ object.titulo }}</title>
+    <style>
+        body { font-family: sans-serif; margin: 2em; }
+        a { text-decoration: none; color: #007bff; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>{{ object.titulo }}</h1>
+    <h2><a href="{% url 'empresa-detail' object.empresa.pk %}">{{ object.empresa.razon_social }}</a></h2>
+    
+    <p><strong>Ubicación:</strong> {{ object.region.nombre_region }}</p>
+    <p><strong>Tipo de Contrato:</strong> {{ object.tipo_contrato.nombre_contrato|default:"No especificado" }}</p>
+    <p><strong>Estado:</strong> {{ object.get_estado_display }}</p>
+    <p><strong>Publicado el:</strong> {{ object.fecha_publicacion|date:"d/m/Y" }}</p>
+
+    <h3>Descripción del Puesto</h3>
+    <div>{{ object.descripcion|linebreaksbr }}</div>
+
+    <hr>
+    <a href="{% url 'ofertaempleo-update' object.pk %}">Editar</a> |
+    <a href="{% url 'ofertaempleo-delete' object.pk %}">Eliminar</a> |
+    <a href="{% url 'ofertaempleo-list' %}">Volver al listado</a>
+</body>
+</html>

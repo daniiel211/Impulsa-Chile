@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Detalle de {{ object.titulo }}</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        margin: 2em;
+      }
+      a {
+        text-decoration: none;
+        color: #007bff;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>{{ object.titulo }}</h1>
+    <p>
+      <strong>Duración:</strong> {{ object.duracion_horas|default:"No
+      especificada" }} horas
+    </p>
+
+    <h2>Descripción</h2>
+    <p>{{ object.descripcion|linebreaksbr|default:"Sin descripción." }}</p>
+
+    {% if object.url_contenido %}
+    <p>
+      <a href="{{ object.url_contenido }}" target="_blank"
+        >Ir al contenido del curso</a
+      >
+    </p>
+    {% endif %}
+
+    <hr />
+    <a href="{% url 'curso-update' object.pk %}">Editar</a> |
+    <a href="{% url 'curso-list' %}">Volver al listado</a>
+  </body>
+</html>
