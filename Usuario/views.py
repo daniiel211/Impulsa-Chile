@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import UserRegistrationForm, TrabajadorProfileForm
+from django.http import HttpRequest, HttpResponse, JsonResponse
+
 
 def trabajador_register(request):
     if request.method == 'POST':
@@ -28,3 +30,12 @@ def trabajador_register(request):
         user_form = UserRegistrationForm()
         profile_form = TrabajadorProfileForm()
     return render(request, 'Usuario/register.html', {'user_form': user_form, 'profile_form': profile_form})
+
+def employeeView(request) :
+    emp = {
+        'id':123,
+        'name' : 'Clark',
+        'email' : 'sup@jl.org',
+        'salary' : '5000'
+    }
+    return JsonResponse (emp)
