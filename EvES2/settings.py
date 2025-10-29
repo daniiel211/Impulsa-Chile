@@ -59,7 +59,14 @@ ROOT_URLCONF = 'EvES2.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates'),
+            # This will allow Django to find templates in app directories without a 'templates' subfolder.
+            os.path.join(BASE_DIR, 'Usuario'),
+            os.path.join(BASE_DIR, 'Empresa'),
+            os.path.join(BASE_DIR, 'Curso'),
+            os.path.join(BASE_DIR, 'Oferta_Empleo'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
