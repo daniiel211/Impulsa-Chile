@@ -22,6 +22,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('cursos/', include('Curso.urls')),
     path('empresas/', include('Empresa.urls')),
-    path('usuarios/', include('Usuario.urls')),
+    path('usuarios/', include('Usuario.urls')), # This now correctly points to your new urls.py
     path('ofertas/', include('Oferta_Empleo.urls')),
 ]
