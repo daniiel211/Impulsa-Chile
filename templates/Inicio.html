@@ -1,0 +1,53 @@
+{% extends 'base.html' %} {% block title %}Impulsa Chile - Inicio{% endblock %}
+{%block content %}
+<div class="px-4 py-5 my-5 text-center">
+  <img class="d-block mx-auto mb-4" src="https://via.placeholder.com/72" alt="" width="72" height="57">
+  <h1 class="display-5 fw-bold text-body-emphasis">Bienvenido a Impulsa Chile</h1>
+  <div class="col-lg-6 mx-auto">
+    <p class="lead mb-4">
+      Tu plataforma para la gestión de cursos, empresas y oportunidades laborales. Selecciona un módulo para comenzar.
+    </p>
+  </div>
+</div>
+
+<div class="row justify-content-center text-center g-4">
+  <div class="col-lg-4 mb-4">
+    <div class="card h-100 shadow-sm">
+      <div class="card-body">
+        <i class="bi bi-book-half fs-1 text-primary"></i>
+        <h5 class="card-title mt-3">Gestión de Cursos</h5>
+        <p class="card-text">
+          Administra los cursos de capacitación disponibles.
+        </p>
+        <a href="{% url 'curso-list' %}" class="btn btn-primary">Gestionar Cursos</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4 mb-4">
+    <div class="card h-100 shadow-sm">
+      <div class="card-body">
+        <i class="bi bi-building fs-1 text-success"></i>
+        <h5 class="card-title mt-3">Gestión de Empresas</h5>
+        <p class="card-text">
+          Administra la información de las empresas asociadas.
+        </p>
+        <a href="{% url 'empresa-list' %}" class="btn btn-primary">Gestionar Empresas</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4 mb-4">
+    <div class="card h-100 shadow-sm">
+      <div class="card-body">
+        <i class="bi bi-briefcase-fill fs-1 text-info"></i>
+        <h5 class="card-title mt-3">Búsqueda de Empleo</h5>
+        <p class="card-text">
+          Conoce y solicita ofertas de empleo.
+        </p>
+        <a href="{% url 'ofertaempleo-list' %}" class="btn btn-primary">Ir a ofertas de empleo</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

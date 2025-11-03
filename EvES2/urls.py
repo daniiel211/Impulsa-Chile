@@ -17,9 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.urls import include
+from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', views.inicio, name='Inicio'), # Ruta raíz para la página de inicio
+    path('inicio/', views.inicio, name='inicio-alias'), # Alias por si se accede directamente
     path('cursos/', include('Curso.urls')),
     path('empresas/', include('Empresa.urls')),
     path('usuarios/', include('Usuario.urls')), # This now correctly points to your new urls.py

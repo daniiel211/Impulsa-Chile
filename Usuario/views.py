@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import UserRegistrationForm, TrabajadorProfileForm
 from django.http import HttpRequest, HttpResponse, JsonResponse
-
+from django.contrib.auth.views import LogoutView
+from django.contrib.messages.views import SuccessMessageMixin
 
 def trabajador_register(request):
     if request.method == 'POST':
@@ -39,3 +40,6 @@ def employeeView(request) :
         'salary' : '5000'
     }
     return JsonResponse (emp)
+
+class CustomLogoutView(SuccessMessageMixin, LogoutView):
+    success_message = "Has cerrado sesión exitosamente."
