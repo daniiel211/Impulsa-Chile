@@ -25,8 +25,8 @@ SECRET_KEY = 'django-insecure-=wg@8@c*^%vmc$58qr0$8zop%q2__@+m3u3bnxrz#qkk=3@536
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['10.58.2.28','127.0.0.1']
+#SECURE_SSL_REDIRECT = True
 
 
 # Application definition
@@ -138,5 +138,5 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # URL a la que se redirige después de un inicio de sesión exitoso.
-LOGIN_REDIRECT_URL = 'ofertaempleo-list'
+LOGIN_REDIRECT_URL = 'Inicio'
 LOGOUT_REDIRECT_URL = 'login' # Opcional: a dónde ir después de cerrar sesión.

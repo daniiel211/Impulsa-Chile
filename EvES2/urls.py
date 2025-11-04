@@ -16,13 +16,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from django.urls import include
+from django.urls import include, reverse_lazy
+from django.views.generic import RedirectView
 from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.inicio, name='Inicio'), # Ruta raíz para la página de inicio
-    path('inicio/', views.inicio, name='inicio-alias'), # Alias por si se accede directamente
+    # Redirige la ruta raíz a la página de login
+    path('', RedirectView.as_view(url=reverse_lazy('login')), name='root-redirect-to-login'),
+    path('inicio/', views.inicio, name='Inicio'), # Página de inicio, ahora con el nombre 'Inicio'
     path('cursos/', include('Curso.urls')),
     path('empresas/', include('Empresa.urls')),
     path('usuarios/', include('Usuario.urls')), # This now correctly points to your new urls.py

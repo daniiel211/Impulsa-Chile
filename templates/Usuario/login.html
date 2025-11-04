@@ -1,153 +1,62 @@
-<!DOCTYPE html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Iniciar Sesión</title>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-      :root {
-        --primary-color: #007bff;
-        --primary-hover-color: #0056b3;
-        --background-color: #f4f7f6;
-        --container-bg-color: #ffffff;
-        --text-color: #333;
-        --label-color: #555;
-        --border-color: #ddd;
-        --error-color: #dc3545;
-        --success-color: #28a745;
-      }
-      body {
-        font-family: "Roboto", sans-serif;
-        margin: 0;
-        background-color: var(--background-color);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        padding: 1em;
-        box-sizing: border-box;
-      }
-      .login-container {
-        background: var(--container-bg-color);
-        padding: 2.5em;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        width: 100%;
-        max-width: 400px;
-      }
-      h1 {
-        color: var(--text-color);
-        text-align: center;
-        margin-bottom: 1.5em;
-        font-weight: 700;
-      }
-      .input-group {
-        position: relative;
-        margin-bottom: 1.5em;
-      }
-      .input-group i {
-        position: absolute;
-        left: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--label-color);
-      }
-      input[type="text"],
-      input[type="password"] {
-        width: 100%;
-        padding: 12px 12px 12px 40px;
-        border-radius: 5px;
-        border: 1px solid var(--border-color);
-        box-sizing: border-box;
-        transition: border-color 0.3s;
-      }
-      input[type="text"]:focus,
-      input[type="password"]:focus {
-        outline: none;
-        border-color: var(--primary-color);
-      }
-      button {
-        background-color: var(--primary-color);
-        color: white;
-        padding: 12px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 1em;
-        font-weight: 500;
-        width: 100%;
-        transition: background-color 0.3s;
-      }
-      button:hover {
-        background-color: var(--primary-hover-color);
-      }
-      .messages, .error-message {
-        color: var(--error-color);
-        list-style-type: none;
-        padding: 0;
-        margin-bottom: 1em;
-        text-align: center;
-        font-size: 0.9em;
-      }
-      .messages .success {
-        color: var(--success-color);
-      }
-      p {
-        text-align: center;
-        margin-top: 1.5em;
-      }
-      a {
-        color: var(--primary-color);
-        text-decoration: none;
-      }
-      a:hover {
-        text-decoration: underline;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="login-container">
-      <h1>Iniciar Sesión</h1>
+{% extends 'base.html' %}
+{% load static %}
 
-      {% if messages %}
-      <ul class="messages">
-        {% for message in messages %}
-        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-        {% endfor %}
-      </ul>
-      {% endif %} 
-      
-      {% if form.non_field_errors %}
-      <div class="error-message">
-        <p>Tu nombre de usuario y contraseña no coinciden. Por favor, inténtalo de nuevo.</p>
-      </div>
-      {% endif %}
+{% block title %}Iniciar Sesión - Impulsa Chile{% endblock %}
 
-      <form method="post" action="{% url 'login' %}">
-        {% csrf_token %}
-        <div class="input-group">
-          <i class="fas fa-user"></i>
-          {{ form.username }}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7">
+            <div class="card shadow-sm">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <img class="mb-4" src="https://via.placeholder.com/72x57" alt="Logo Impulsa Chile" width="72" height="57">
+                        <h2 class="card-title fw-bold">Bienvenido de vuelta</h2>
+                        <p class="text-muted">Ingresa tus credenciales para acceder.</p>
+                    </div>
+
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            Tu nombre de usuario y contraseña no coinciden. Por favor, inténtalo de nuevo.
+                        </div>
+                    {% endif %}
+
+                    {% if messages %}
+                        <div class="mb-3">
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <form method="post" action="{% url 'login' %}">
+                        {% csrf_token %}
+                        
+                        <div class="input-group mb-3">
+                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                            <input type="text" name="username" class="form-control" id="id_username" placeholder="Nombre de usuario" required>
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            <input type="password" name="password" class="form-control" id="id_password" placeholder="Contraseña" required>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            {# Aquí podrías agregar un checkbox de "Recordarme" si lo implementas #}
+                            <a href="#" class="form-text">¿Olvidaste tu contraseña?</a>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 btn-lg">Ingresar</button>
+                    </form>
+                    <p class="text-center mt-3">
+                        ¿Aún no tienes una cuenta? <a href="{% url 'trabajador-register' %}">Regístrate</a>
+                    </p>
+                </div>
+            </div>
         </div>
-        <div class="input-group">
-          <i class="fas fa-lock"></i>
-          {{ form.password }}
-        </div>
-        <button type="submit">Iniciar Sesión</button>
-      </form>
-      <p>
-        <a href="{% url 'trabajador-register' %}"
-          >¿No tienes una cuenta? Regístrate</a
-        >
-      </p>
     </div>
-  </body>
-</html>
+</div>
+{% endblock %}
