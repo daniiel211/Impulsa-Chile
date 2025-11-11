@@ -20,6 +20,16 @@ class Trabajador(models.Model):
         verbose_name = "Trabajador"
         verbose_name_plural = "Trabajadores"
 
+class Certificacion(models.Model):
+    trabajador = models.ForeignKey(Trabajador, on_delete=models.CASCADE, related_name='certificaciones')
+    nombre = models.CharField(max_length=200, blank=True)
+    archivo = models.FileField(upload_to='certificaciones/', blank=False, null=True)
+    fecha_subida = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        base = self.nombre or "Certificación"
+        return f"{base} de {self.trabajador.usuario.username}"
+
 class Employee (models. Model) :
     id = models. IntegerField(primary_key=True)
     name = models. CharField(max_length=50)
