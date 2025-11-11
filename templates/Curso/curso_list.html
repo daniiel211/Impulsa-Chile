@@ -73,6 +73,7 @@
               <h2 class="h6 mb-2">Completa tu resumen profesional</h2>
               <form method="post" action="{% url 'usuario-profile-update' %}" class="row g-2">
                 {% csrf_token %}
+                <input type="hidden" name="form_type" value="resumen">
                 <div class="col-12">
                   <textarea name="resumen_profesional" rows="3" class="form-control" placeholder="Describe tu experiencia, logros e intereses" required>{% if trabajador and trabajador.resumen_profesional %}{{ trabajador.resumen_profesional }}{% endif %}</textarea>
                 </div>
@@ -86,6 +87,7 @@
               <h2 class="h6 mb-2">Sube tu CV (PDF)</h2>
               <form method="post" action="{% url 'usuario-profile-update' %}" enctype="multipart/form-data" class="row g-2">
                 {% csrf_token %}
+                <input type="hidden" name="form_type" value="cv">
                 <div class="col-12 col-md-9">
                   <input type="file" name="cv" accept="application/pdf" class="form-control" required />
                   {% if trabajador and trabajador.cv %}
@@ -104,6 +106,7 @@
               <h2 class="h6 mb-2">Certificaciones</h2>
               <form method="post" action="{% url 'usuario-profile-update' %}" enctype="multipart/form-data" class="row g-2">
                 {% csrf_token %}
+                <input type="hidden" name="form_type" value="certificacion">
                 <div class="col-12 col-md-9">
                   <textarea name="certificaciones_text" rows="3" class="form-control" placeholder="Nombre o notas de la certificación (opcional)"></textarea>
                   <div class="mt-2">
@@ -121,6 +124,7 @@
               <h2 class="h6 mb-2">Proyectos destacados</h2>
               <form method="post" action="{% url 'usuario-profile-update' %}" class="row g-2">
                 {% csrf_token %}
+                <input type="hidden" name="form_type" value="proyectos">
                 <div class="col-12">
                   <textarea name="proyectos_text" rows="3" class="form-control" placeholder="Ej: Dashboard ejecutivo de indicadores; Automatización de reportes; Panel de BI" required></textarea>
                 </div>
@@ -134,6 +138,7 @@
               <h2 class="h6 mb-2">Idiomas</h2>
               <form method="post" action="{% url 'usuario-profile-update' %}" class="row g-2">
                 {% csrf_token %}
+                <input type="hidden" name="form_type" value="idiomas">
                 <div class="col-12 col-md-9">
                   <input type="text" name="idiomas_text" class="form-control" placeholder="Ej: Español (nativo), Inglés (B2), Portugués (A2)" required>
                 </div>
@@ -147,6 +152,7 @@
               <h2 class="h6 mb-2">Preferencias de aprendizaje</h2>
               <form method="post" action="{% url 'usuario-profile-update' %}" class="row g-2">
                 {% csrf_token %}
+                <input type="hidden" name="form_type" value="preferencias">
                 <div class="col-12 col-md-9">
                   <input type="text" name="preferencias_text" class="form-control" placeholder="Ej: 3h/semana; cursos cortos; enfoque práctico; habilidades blandas primero" required>
                 </div>
@@ -226,8 +232,12 @@
           <a href="{% url 'curso-detail' curso.pk %}" class="fw-semibold">{{ curso.titulo }}</a>
           <span class="text-nowrap">
             {% if user.is_authenticated %}
-              <a href="{% url 'curso-update' curso.pk %}" class="btn btn-sm btn-outline-primary">Editar</a>
-              <a href="{% url 'curso-delete' curso.pk %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
+              {% if perms.Curso.change_curso %}
+                <a href="{% url 'curso-update' curso.pk %}" class="btn btn-sm btn-outline-primary">Editar</a>
+              {% endif %}
+              {% if perms.Curso.delete_curso %}
+                <a href="{% url 'curso-delete' curso.pk %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
+              {% endif %}
             {% endif %}
           </span>
         </li>

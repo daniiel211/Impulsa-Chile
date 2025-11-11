@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth import logout
 from django.contrib import messages
 from .forms import UserRegistrationForm, TrabajadorProfileForm
 from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.urls import reverse_lazy
 from django.contrib.auth.views import LogoutView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.decorators import login_required
@@ -45,6 +47,12 @@ def employeeView(request) :
 
 class CustomLogoutView(SuccessMessageMixin, LogoutView):
     success_message = "Has cerrado sesión exitosamente."
+    next_page = reverse_lazy('login')
+
+    # Opcional: Para permitir logout con GET (menos seguro)
+    def get(self, request, *args, **kwargs):
+        logout(request)
+        return super().get(request, *args, **kwargs)
 
 
 @login_required
@@ -167,7 +175,7 @@ def perfil_resumen(request):
     perfil, _ = Trabajador.objects.get_or_create(usuario=request.user)
 
     habilidades = perfil.habilidades.all().order_by('nombre_habilidad') if perfil else []
-    certificaciones = perfil.certificaciones.all().order_by('-fecha_subida') if hasattr(perfil, 'certificaciones') else []
+    certificaciones = Certificacion.objects.filter(trabajador=perfil).order_by('-fecha_subida')
 
     # Parsear bloques del texto de resumen_profesional si existen
     resumen_lines = (perfil.resumen_profesional or '').splitlines()

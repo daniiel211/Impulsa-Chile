@@ -11,7 +11,7 @@ from django.views.generic import (
 from .models import Empresa
 from django.http import Http404
 from django.db.models import Q
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 FEATURED_SUGGESTIONS = [
     {
@@ -106,11 +106,12 @@ class EmpresaDetailView(DetailView):
     model = Empresa
     template_name = 'Empresa/empresa_detail.html'
 
-class EmpresaCreateView(LoginRequiredMixin, CreateView):
+class EmpresaCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     model = Empresa
     fields = ['industria', 'rut', 'razon_social', 'descripcion']
     template_name = 'Empresa/empresa_form.html'
     success_url = reverse_lazy('empresa-list')
+    permission_required = 'Empresa.add_empresa'
 
     def form_valid(self, form):
         form.instance.usuario = self.request.user
