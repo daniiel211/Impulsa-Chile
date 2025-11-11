@@ -47,12 +47,19 @@ def employeeView(request) :
 
 class CustomLogoutView(SuccessMessageMixin, LogoutView):
     success_message = "Has cerrado sesión exitosamente."
-    next_page = reverse_lazy('login')
+    next_page = reverse_lazy('login') # Esta propiedad es usada por get_redirect_url()
+    http_method_names = ["get", "post"] # Permitir explícitamente peticiones GET y POST
 
-    # Opcional: Para permitir logout con GET (menos seguro)
+    # Sobrescribimos el método 'get' para permitir el logout a través de un enlace (petición GET).
+    # Esto es menos seguro que usar POST, pero es muy común por conveniencia.
     def get(self, request, *args, **kwargs):
+        # 1. Llama a la función de logout de Django para limpiar la sesión.
         logout(request)
-        return super().get(request, *args, **kwargs)
+        # 2. Añade el mensaje de éxito que se mostrará en la siguiente página.
+        messages.success(self.request, self.success_message)
+        # 3. Redirige explícitamente a la URL de 'login'.
+        # Esto es más seguro que depender de self.next_page, que causaba el error.
+        return redirect('login')
 
 
 @login_required
@@ -90,82 +97,80 @@ def add_habilidades(request):
 
 @login_required
 def profile_update(request):
-    # Crear o recuperar perfil
-    perfil, _ = Trabajador.objects.get_or_create(usuario=request.user)
     if request.method != 'POST':
+        # Redirigir si no es una petición POST
         return redirect('curso-list')
 
-    # Actualización segura por campos específicos
-    resumen = request.POST.get('resumen_profesional')
-    certificaciones_text = request.POST.get('certificaciones_text')
-    proyectos_text = request.POST.get('proyectos_text')
-    idiomas_text = request.POST.get('idiomas_text')
-    preferencias_text = request.POST.get('preferencias_text')
+    # Obtener o crear el perfil del trabajador para asegurar que exista
+    trabajador, _ = Trabajador.objects.get_or_create(usuario=request.user)
+    form_type = request.POST.get('form_type')
 
-    # Validaciones: bloquear envíos vacíos por sección
-    if 'resumen_profesional' in request.POST and (resumen is None or not resumen.strip()):
-        messages.warning(request, 'El resumen no puede estar vacío.')
-        return redirect('curso-list')
-    if 'proyectos_text' in request.POST and (proyectos_text is None or not proyectos_text.strip()):
-        messages.warning(request, 'Ingresa al menos un proyecto.')
-        return redirect('curso-list')
-    if 'idiomas_text' in request.POST and (idiomas_text is None or not idiomas_text.strip()):
-        messages.warning(request, 'Ingresa al menos un idioma.')
-        return redirect('curso-list')
-    if 'preferencias_text' in request.POST and (preferencias_text is None or not preferencias_text.strip()):
-        messages.warning(request, 'Ingresa tus preferencias de aprendizaje.')
-        return redirect('curso-list')
-    if 'certificaciones_text' in request.POST and (certificaciones_text is None or not certificaciones_text.strip()) and 'certificacion_file' not in request.FILES:
-        messages.warning(request, 'Ingresa texto de certificación o selecciona un archivo.')
-        return redirect('curso-list')
+    if form_type == 'resumen':
+        resumen = request.POST.get('resumen_profesional', '').strip()
+        if not resumen:
+            messages.warning(request, 'El resumen no puede estar vacío.')
+        else:
+            trabajador.resumen_profesional = resumen
+            trabajador.save()
+            messages.success(request, 'Resumen profesional actualizado.')
 
-    # Partimos del resumen actual si existe
-    resumen_actual = perfil.resumen_profesional or ''
-    nuevo_resumen = resumen if resumen is not None else resumen_actual
+    elif form_type == 'cv':
+        if 'cv' not in request.FILES:
+            messages.warning(request, 'Debes seleccionar un archivo PDF para tu CV.')
+        else:
+            trabajador.cv = request.FILES['cv']
+            trabajador.save()
+            messages.success(request, 'CV actualizado correctamente.')
 
-    def normalize_list(text):
-        items = []
-        if text:
-            raw = text.replace('\n', ',').replace(';', ',').split(',')
-            items = [s.strip() for s in raw if s.strip()]
-        return items
+    elif form_type == 'certificacion':
+        cert_text = request.POST.get('certificaciones_text', '').strip()
+        cert_file = request.FILES.get('certificacion_file')
+        if not cert_text and not cert_file:
+            messages.warning(request, 'Debes añadir un nombre o un archivo para la certificación.')
+        else:
+            # Usar la primera línea del texto como nombre si existe
+            nombre_cert = cert_text.splitlines()[0].strip() if cert_text else "Certificación sin nombre"
+            Certificacion.objects.create(
+                trabajador=trabajador,
+                nombre=nombre_cert,
+                archivo=cert_file
+            )
+            messages.success(request, 'Certificación añadida a tu perfil.')
 
-    certs = normalize_list(certificaciones_text)
-    projs = normalize_list(proyectos_text)
-    idiomas = normalize_list(idiomas_text)
-    prefs = normalize_list(preferencias_text)
+    # Los siguientes campos se guardan en el resumen, pero de forma más estructurada.
+    # Podrías considerar crear modelos separados para ellos en el futuro.
+    elif form_type == 'proyectos':
+        proyectos = request.POST.get('proyectos_text', '').strip()
+        if not proyectos:
+            messages.warning(request, 'Ingresa al menos un proyecto.')
+        else:
+            # Aquí podrías guardarlo en un campo específico si lo tuvieras
+            # Por ahora, lo añadimos al resumen
+            trabajador.resumen_profesional = (trabajador.resumen_profesional or '') + f"\n\nProyectos destacados:\n- {proyectos.replace(',', '\n- ')}"
+            trabajador.save()
+            messages.success(request, 'Proyectos añadidos al perfil.')
 
-    blocks = []
-    if certs:
-        blocks.append('Certificaciones:\n' + '\n'.join(f'- {c}' for c in certs))
-    if projs:
-        blocks.append('Proyectos destacados:\n' + '\n'.join(f'- {p}' for p in projs))
-    if idiomas:
-        blocks.append('Idiomas:\n' + '\n'.join(f'- {i}' for i in idiomas))
-    if prefs:
-        blocks.append('Preferencias de aprendizaje:\n' + '\n'.join(f'- {pr}' for pr in prefs))
+    elif form_type == 'idiomas':
+        idiomas = request.POST.get('idiomas_text', '').strip()
+        if not idiomas:
+            messages.warning(request, 'Ingresa al menos un idioma.')
+        else:
+            trabajador.resumen_profesional = (trabajador.resumen_profesional or '') + f"\n\nIdiomas:\n- {idiomas.replace(',', '\n- ')}"
+            trabajador.save()
+            messages.success(request, 'Idiomas añadidos al perfil.')
 
-    if blocks:
-        joiner = '\n\n' if nuevo_resumen else ''
-        nuevo_resumen = (nuevo_resumen or '') + joiner + '\n\n'.join(blocks)
+    elif form_type == 'preferencias':
+        preferencias = request.POST.get('preferencias_text', '').strip()
+        if not preferencias:
+            messages.warning(request, 'Ingresa tus preferencias de aprendizaje.')
+        else:
+            trabajador.resumen_profesional = (trabajador.resumen_profesional or '') + f"\n\nPreferencias de aprendizaje:\n- {preferencias.replace(',', '\n- ')}"
+            trabajador.save()
+            messages.success(request, 'Preferencias de aprendizaje guardadas.')
 
-    perfil.resumen_profesional = nuevo_resumen
+    else:
+        messages.error(request, 'Hubo un error al procesar el formulario. Inténtalo de nuevo.')
 
-    if 'cv' in request.FILES:
-        perfil.cv = request.FILES['cv']
-
-    # Guardar archivo de certificación si se envía
-    if 'certificacion_file' in request.FILES:
-        cert_file = request.FILES['certificacion_file']
-        nombre_cert = None
-        # si viene texto en el mismo submit, usar el primero como nombre
-        if certificaciones_text:
-            first = certificaciones_text.replace('\n', ',').replace(';', ',').split(',')[0].strip()
-            nombre_cert = first if first else None
-        Certificacion.objects.create(trabajador=perfil, archivo=cert_file, nombre=nombre_cert or '')
-
-    perfil.save()
-    messages.success(request, 'Perfil actualizado correctamente.')
     return redirect('curso-list')
 
 
