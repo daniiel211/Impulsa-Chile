@@ -58,15 +58,17 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'EvES2.urls'
 
+# settings.py - Sección TEMPLATES
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'templates'),
-            os.path.join(BASE_DIR, 'Usuario'),
-            os.path.join(BASE_DIR, 'Empresa'),
-            os.path.join(BASE_DIR, 'Curso'),
-            os.path.join(BASE_DIR, 'Oferta_Empleo'),
+            # **CLAVE: Reemplaza os.path.join por el operador / de pathlib**
+            BASE_DIR / 'templates',
+            BASE_DIR / 'Usuario',
+            BASE_DIR / 'Empresa',
+            BASE_DIR / 'Curso',
+            BASE_DIR / 'Oferta_Empleo',
         ],
         'APP_DIRS': True,
         'OPTIONS': {
