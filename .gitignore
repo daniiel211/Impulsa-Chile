@@ -2,7 +2,7 @@
 .git
 
 # Environments
-.env
+
 .venv
 env/
 venv/
