@@ -1,0 +1,177 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Impulsa Chile{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-+8d0qYqQZfD1VjFz7RrQ4JXvI9oYHnBf4t4pW2bWQ9lYqjvEo7OhaW3z3Yf5fGQ+u+5kN2eVv4sM6wG9rF+Pgw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+      html { scroll-behavior: smooth; }
+      :root { --brand: #2563eb; --brand-start:#2563eb; --brand-end:#0ea5e9; --text: #1f2937; --muted: #6b7280; --bg-band: #f5f7fb; }
+      body { font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, sans-serif; color: var(--text); }
+      .navbar-brand { font-weight: 700; letter-spacing: 0.2px; }
+      /* Wordmark temporal (sin logo): badge + texto */
+      .navbar-brand { display: inline-flex; align-items: center; gap: .25rem; }
+      .brand-badge { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:8px; background: linear-gradient(135deg, var(--brand-start), var(--brand-end)); color:#fff; font-weight:700; font-size:14px; box-shadow: 0 6px 16px rgba(37,99,235,.18); }
+      .brand-word { font-weight:700; letter-spacing:0.4px; }
+      .btn-brand { background-color: var(--brand); color: #fff; }
+      .btn-brand:hover { filter: brightness(1.05); color: #fff; }
+      .card-hover { transition: transform .2s ease, box-shadow .2s ease; border: 1px solid #e9ecef; }
+      .card-hover:hover { transform: translateY(-2px); box-shadow: 0 .75rem 1.5rem rgba(0,0,0,.08); }
+      footer.footer { background: #f8f9fa; border-top: 1px solid #e9ecef; }
+      .section-title { font-weight: 600; }
+      .band { background: var(--bg-band); }
+      .band-soft { background: linear-gradient(180deg, #f7f9fc 0%, #eef3f9 100%); }
+      .band-soft-alt { background: linear-gradient(180deg, #f6f8fc 0%, #edf2f8 100%); }
+      /* Onda separadora */
+      .wave { display:block; width:100%; height:80px; }
+      .band-soft { background: linear-gradient(180deg, #f7f9fc 0%, #eef3f9 100%); }
+      /* Botón gradiente y utilidades */
+      .btn-gradient { background: linear-gradient(135deg, var(--brand-start), var(--brand-end)); color:#fff; border:0; }
+      .btn-gradient:hover { filter: brightness(1.05); color:#fff; }
+      .gradient-text { background: linear-gradient(90deg, var(--brand-start), var(--brand-end)); -webkit-background-clip:text; background-clip:text; color: transparent; }
+      /* Header estilo Mercado Libre */
+      .ml-search .form-control { height: 44px; border-radius: 999px; padding-left: 2.25rem; box-shadow: 0 2px 6px rgba(0,0,0,.06); }
+      .ml-search .bi-search { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #9ca3af; }
+      .ml-cats a { color: #4b5563; text-decoration: none; padding: 8px 12px; border-radius: 6px; }
+      .ml-cats a:hover { background: rgba(37,99,235,.08); }
+      /* Hero utilidades previas (por compatibilidad) */
+      .hero-gradient { position: relative; overflow: hidden; background: radial-gradient(1000px 500px at 10% 10%, rgba(37,99,235,.18), transparent), radial-gradient(800px 400px at 90% 20%, rgba(14,165,233,.16), transparent); }
+      .hero-gradient::before { content:""; position:absolute; inset:0; background: linear-gradient(180deg, rgba(17,24,39,.35), rgba(17,24,39,.35)); z-index:1; }
+      .hero-gradient .container { position: relative; z-index:2; }
+      .shape-blur { position:absolute; width:520px; height:520px; filter: blur(75px); border-radius:50%; opacity:.6; z-index:0; }
+      .shape-blur.one { background: #2563eb; top:-120px; left:-120px; }
+      .shape-blur.two { background: #0ea5e9; bottom:-160px; right:-140px; }
+      .glass { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.25); box-shadow: 0 1rem 2rem rgba(0,0,0,.15); backdrop-filter: blur(10px); }
+    </style>
+  </head>
+  <body class="bg-light">
+    <!-- Header estilo Mercado Libre: claro con buscador central -->
+    <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+      <div class="container">
+        <a class="navbar-brand" href="{% url 'Inicio' %}"><span class="brand-badge">I</span><span class="brand-word">Impulsa Chile</span></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mlNav"><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="mlNav">
+          <!-- Buscador central -->
+          <div class="ms-lg-3 flex-grow-1 my-2 my-lg-0 position-relative ml-search">
+            <i class="bi bi-search" role="button" aria-label="Buscar"></i>
+            <input id="global-search" type="text" class="form-control" placeholder="Buscar cursos, empresas y empleos" aria-label="Barra de búsqueda" />
+          </div>
+          <!-- Acciones -->
+          <ul class="navbar-nav ms-lg-3">
+            {% if user.is_authenticated %}
+              <li class="nav-item d-flex align-items-center text-muted small">Hola, {{ user.get_username }}</li>
+              <li class="nav-item"><a class="nav-link" href="{% url 'usuario-perfil-resumen' %}"><i class="bi bi-person"></i> Tu perfil</a></li>
+              <li class="nav-item"><a class="btn btn-outline-secondary btn-sm ms-lg-2" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a></li>
+            {% else %}
+              <li class="nav-item"><a class="nav-link" href="{% url 'trabajador-register' %}">Registrarse</a></li>
+              <li class="nav-item"><a class="btn btn-gradient btn-sm ms-lg-2" href="{% url 'login' %}"><i class="bi bi-person"></i> Ingresar</a></li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- Barra de categorías -->
+    <div class="ml-cats bg-light border-bottom">
+      <div class="container d-flex flex-wrap align-items-center gap-2 py-2">
+        {% if user.is_authenticated %}
+        <a href="{% url 'usuario-perfil-resumen' %}"><i class="bi bi-person me-1"></i> Tu perfil</a>
+        {% else %}
+        <a href="{% url 'curso-list' %}"><i class="bi bi-book-half me-1"></i> Cursos</a>
+        {% endif %}
+        <a href="{% url 'empresa-list' %}"><i class="bi bi-building me-1"></i> Empresas</a>
+        <a href="{% url 'ofertaempleo-list' %}"><i class="bi bi-briefcase-fill me-1"></i> Ofertas de empleo</a>
+      </div>
+    </div>
+
+    <main class="container mt-4">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+      
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer py-4 mt-5">
+      <div class="container d-flex flex-column flex-md-row align-items-center justify-content-between">
+        <p class="mb-2 mb-md-0 text-muted">&copy; {{ now|date:"Y" }} Impulsa Chile</p>
+        <div class="text-muted">
+          <i class="bi bi-envelope"></i> contacto@impulsa.cl
+          <span class="mx-2">|</span>
+          <i class="bi bi-shield-lock"></i> Seguridad primero
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script> AOS.init({ duration: 700, easing: 'ease-out', once: true }); </script>
+    <script>
+      // Búsqueda simple: redirige según palabras clave del módulo
+      (function() {
+        const input = document.getElementById('global-search');
+        if (!input) return;
+
+        const routes = {
+          'cursos': "{% url 'curso-list' %}",
+          'curso': "{% url 'curso-list' %}",
+          'empresas': "{% url 'empresa-list' %}",
+          'empresa': "{% url 'empresa-list' %}",
+          'empleo': "{% url 'ofertaempleo-list' %}",
+          'empleos': "{% url 'ofertaempleo-list' %}",
+          'ofertas': "{% url 'ofertaempleo-list' %}",
+          'oferta': "{% url 'ofertaempleo-list' %}",
+          'módulos': "{% url 'Inicio' %}#modulos",
+          'modulos': "{% url 'Inicio' %}#modulos",
+          'explorar': "{% url 'Inicio' %}#modulos",
+          'inicio': "{% url 'Inicio' %}#modulos"
+        };
+
+        function performSearch() {
+          const q = (input.value || '').toLowerCase().trim();
+          if (!q) return;
+          for (const key in routes) {
+            if (q.includes(key)) {
+              window.location.href = routes[key];
+              return;
+            }
+          }
+        }
+
+        input.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            performSearch();
+          }
+        });
+
+        // También al hacer click en el ícono de lupa
+        const icon = document.querySelector('.ml-search .bi-search');
+        if (icon) {
+          icon.addEventListener('click', function() {
+            performSearch();
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>

@@ -5,6 +5,7 @@ from .views import (
     EmpresaCreateView,
     EmpresaUpdateView,
     EmpresaDeleteView,
+    FeaturedEmpresaDetailView,
 )
 
 urlpatterns = [
@@ -13,4 +14,5 @@ urlpatterns = [
     path('<int:pk>/', EmpresaDetailView.as_view(), name='empresa-detail'),
     path('<int:pk>/editar/', EmpresaUpdateView.as_view(), name='empresa-update'),
     path('<int:pk>/eliminar/', EmpresaDeleteView.as_view(), name='empresa-delete'),
+    path('destacada/<slug:slug>/', FeaturedEmpresaDetailView.as_view(), name='empresa-destacada'),
 ]

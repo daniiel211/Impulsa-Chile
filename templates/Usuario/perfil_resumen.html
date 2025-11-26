@@ -1,0 +1,187 @@
+{% extends 'Base.html' %}
+{% block title %}Tu perfil — Resumen{% endblock %}
+{% block content %}
+
+<section class="py-3">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 col-lg-8" data-aos="fade-up">
+        <h1 class="h4 section-title mb-2">Resumen de tu perfil</h1>
+        <!-- Texto introductorio eliminado según solicitud -->
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- Tarjeta de encabezado con datos básicos -->
+      <div class="col-12" data-aos="fade-up">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body">
+            <div class="d-flex align-items-center gap-3">
+              <div class="rounded" style="width:56px;height:56px;background:linear-gradient(135deg,var(--brand-start),var(--brand-end));"></div>
+              <div>
+                <h5 class="mb-0">{{ user_obj.get_full_name|default:user_obj.username }}</h5>
+                <small class="text-muted">{{ user_obj.email }}</small>
+              </div>
+            </div>
+            {% if perfil.cv %}
+            <div class="mt-3">
+              <a href="{{ perfil.cv.url }}" class="btn btn-outline-primary btn-sm"><i class="bi bi-file-earmark-pdf"></i> Ver CV</a>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Resumen profesional -->
+      <div class="col-12 col-lg-8" data-aos="fade-up">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <h6 class="mb-2">Resumen profesional</h6>
+            {% if perfil.resumen_profesional %}
+              <p class="text-muted" style="white-space:pre-line;">{{ perfil.resumen_profesional }}</p>
+            {% else %}
+              <p class="text-muted">Aún no has agregado un resumen. Puedes completarlo en “Tu perfil”.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Habilidades -->
+      <div class="col-12 col-lg-4" data-aos="fade-up" data-aos-delay="50">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <h6 class="mb-2">Habilidades</h6>
+            {% if habilidades %}
+              <div class="d-flex flex-wrap gap-2">
+                {% for h in habilidades %}
+                  <span class="badge text-bg-primary">{{ h.nombre_habilidad }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              <p class="text-muted mb-0">Sin habilidades agregadas aún.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Certificaciones -->
+      <div class="col-12" data-aos="fade-up" data-aos-delay="100">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body">
+            <h6 class="mb-2">Certificaciones</h6>
+            {% if certificaciones %}
+              <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                  <thead>
+                    <tr>
+                      <th>Nombre</th>
+                      <th>Archivo</th>
+                      <th>Fecha</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for c in certificaciones %}
+                      <tr>
+                        <td>{{ c.nombre|default:"Certificación" }}</td>
+                        <td>
+                          {% if c.archivo %}
+                            <a href="{{ c.archivo.url }}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-download"></i> Descargar</a>
+                          {% else %}
+                            <span class="text-muted">Sin archivo</span>
+                          {% endif %}
+                        </td>
+                        <td><small class="text-muted">{{ c.fecha_subida|date:"Y-m-d H:i" }}</small></td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% else %}
+              <p class="text-muted mb-0">Aún no has subido certificaciones.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Currículum (CV) -->
+      <div class="col-12 col-lg-4" data-aos="fade-up" data-aos-delay="120">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <h6 class="mb-2">Currículum (CV)</h6>
+            {% if perfil.cv %}
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-file-earmark-text text-primary"></i>
+                <span class="text-muted">{{ perfil.cv.name|default:"CV" }}</span>
+              </div>
+              <div class="mt-2">
+                <a href="{{ perfil.cv.url }}" class="btn btn-outline-primary btn-sm"><i class="bi bi-download"></i> Descargar CV</a>
+              </div>
+            {% else %}
+              <p class="text-muted mb-0">Aún no has subido tu CV.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Proyectos destacados -->
+      <div class="col-12 col-lg-6" data-aos="fade-up" data-aos-delay="140">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <h6 class="mb-2">Proyectos destacados</h6>
+            {% if proyectos %}
+              <ul class="list-unstyled mb-0">
+                {% for p in proyectos %}
+                  <li class="d-flex align-items-start gap-2"><i class="bi bi-lightbulb text-warning"></i> <span>{{ p }}</span></li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p class="text-muted mb-0">Sin proyectos agregados aún.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Idiomas -->
+      <div class="col-12 col-lg-6" data-aos="fade-up" data-aos-delay="160">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <h6 class="mb-2">Idiomas</h6>
+            {% if idiomas %}
+              <ul class="list-unstyled mb-0">
+                {% for i in idiomas %}
+                  <li class="d-flex align-items-start gap-2"><i class="bi bi-translate text-success"></i> <span>{{ i }}</span></li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p class="text-muted mb-0">Sin idiomas registrados aún.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Preferencias de aprendizaje -->
+      <div class="col-12" data-aos="fade-up" data-aos-delay="180">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body">
+            <h6 class="mb-2">Preferencias de aprendizaje</h6>
+            {% if preferencias %}
+              <ul class="list-unstyled mb-0">
+                {% for pref in preferencias %}
+                  <li class="d-flex align-items-start gap-2"><i class="bi bi-sliders text-info"></i> <span>{{ pref }}</span></li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p class="text-muted mb-0">Sin preferencias registradas aún.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-4" data-aos="fade-up">
+      <a href="{% url 'curso-list' %}" class="btn btn-gradient btn-sm"><i class="bi bi-pencil-square"></i> Editar perfil en “Tu perfil”</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
