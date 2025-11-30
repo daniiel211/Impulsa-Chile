@@ -1,25 +1,26 @@
-# Utiliza una imagen base de Python apropiada (ajusta la versión 3.13)
-FROM python:3.13-slim
+# Recomendación: Usa 3.11 o 3.12 si 3.13 te da problemas de compatibilidad con librerías.
+FROM python:3.11-slim
 
-# Establece el directorio de trabajo
+# Evita que Python genere archivos .pyc y fuerza salida en consola en tiempo real
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
 WORKDIR /app
 
-# Instala las dependencias de sistema necesarias para mysqlclient
-# 'default-libmysqlclient-dev' contiene los headers y libs para compilar.
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
+# Instalar dependencias del sistema (necesarias para mysqlclient y otros)
+RUN apt-get update && apt-get install -y --no-install-recommends \
     default-libmysqlclient-dev \
     build-essential \
-    pkg-config && \
-    rm -rf /var/lib/apt/lists/*
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copia el archivo de requisitos e instala las dependencias de Python
+# Copiar requirements e instalar
 COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copia el resto de tu código
+# Copiar el código del proyecto
 COPY . /app/
 
-# Define el comando de inicio para Gunicorn (asumiendo que tu app se llama EvES2)
-ENV PORT 8000
+# NOTA: No necesitamos CMD aquí porque railway.json lo sobrescribe.
+# Pero dejamos este por si quieres probarlo localmente con Docker.
 CMD gunicorn EvES2.wsgi:application --bind 0.0.0.0:$PORT
