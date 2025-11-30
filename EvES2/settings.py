@@ -29,7 +29,9 @@ SECRET_KEY = config("SECRET_KEY")
 DEBUG = config("DEBUG", default=False, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS','impulsa-chile-production-ae96.up.railway.app', cast=Csv())
 #SECURE_SSL_REDIRECT = True
-
+CSRF_TRUSTED_ORIGINS = ['https://*.railway.app']
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
     
 # Application definition
 
