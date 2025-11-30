@@ -146,7 +146,8 @@ def profile_update(request):
         else:
             # Aquí podrías guardarlo en un campo específico si lo tuvieras
             # Por ahora, lo añadimos al resumen
-            trabajador.resumen_profesional = (trabajador.resumen_profesional or '') + f"\n\nProyectos destacados:\n- {proyectos.replace(',', '\n- ')}"
+            # Código corregido (compatible con Python 3.11)
+            trabajador.resumen_profesional = (trabajador.resumen_profesional or '') + "\n\nProyectos destacados:\n- " + proyectos.replace(',', '\n- ')
             trabajador.save()
             messages.success(request, 'Proyectos añadidos al perfil.')
 
