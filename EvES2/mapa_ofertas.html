@@ -1,0 +1,43 @@
+{% extends "base.html" %} {# Asegúrate de que tu plantilla base exista y tenga un bloque de contenido #}
+
+{% block title %}Mapa de Ofertas de Empleo{% endblock %}
+
+{% block content %}
+<h2>Mapa de Ofertas de Empleo</h2>
+
+<!-- Incluir los archivos de Mapbox -->
+<script src='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css' rel='stylesheet' />
+
+<!-- Contenedor del mapa -->
+<div id='map' style='width: 100%; height: 600px;'></div>
+
+<script>
+  // Token de acceso pasado desde la vista
+  mapboxgl.accessToken = '{{ mapbox_access_token }}';
+
+  // Inicializar el mapa
+  const map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/streets-v11',
+    center: [-70.6693, -33.4489], // Coordenadas de Santiago, Chile
+    zoom: 9
+  });
+
+  // Convertir los datos de Django a un objeto JavaScript
+  const ofertas = JSON.parse('{{ ofertas_json|escapejs }}');
+
+  // Iterar sobre las ofertas y añadir marcadores
+  ofertas.forEach(oferta => {
+    // Crear un popup con información de la oferta
+    const popup = new mapboxgl.Popup({ offset: 25 })
+      .setHTML(`<h3><a href="/ofertas/${oferta.pk}/">${oferta.fields.titulo}</a></h3><p>${oferta.fields.direccion_texto}</p>`);
+
+    // Crear el marcador y añadirlo al mapa
+    new mapboxgl.Marker()
+      .setLngLat([oferta.fields.longitud, oferta.fields.latitud])
+      .setPopup(popup) // Asignar el popup al marcador
+      .addTo(map);
+  });
+</script>
+{% endblock %}

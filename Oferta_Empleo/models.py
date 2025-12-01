@@ -31,6 +31,9 @@ class OfertaEmpleo(models.Model):
         blank=True,
         verbose_name="Tipo de Contrato"
     )
+    latitud = models.FloatField(blank=True, null=True)
+    longitud = models.FloatField(blank=True, null=True)
+    direccion_texto = models.CharField(max_length=255, blank=True, null=True)
     titulo = models.CharField("Título de la Oferta", max_length=255)
     descripcion = models.TextField("Descripción del Puesto")
     estado = models.CharField(

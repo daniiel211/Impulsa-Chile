@@ -27,6 +27,7 @@ urlpatterns = [
     path('inicio/', views.inicio, name='Inicio'), # Página de inicio, ahora con el nombre 'Inicio'
     path('cursos/', include('Curso.urls')),
     path('empresas/', include('Empresa.urls')),
+    path('accounts/', include('allauth.urls')), # URLs para autenticación (login, logout, social)
     path('usuarios/', include('Usuario.urls')), # This now correctly points to your new urls.py
     path('ofertas/', include('Oferta_Empleo.urls')),
 ]

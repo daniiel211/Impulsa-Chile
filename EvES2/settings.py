@@ -27,6 +27,7 @@ SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=bool)
+MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiZGFuaWllbDIxMSIsImEiOiJjbWluYWU5cmwyOXV1M2twc3QyMDRoOHlyIn0.OElPUaG3hQ9O979kUAYVoA'
 ALLOWED_HOSTS = config('ALLOWED_HOSTS','impulsa-chile-production-ae96.up.railway.app', cast=Csv())
 #SECURE_SSL_REDIRECT = True
 CSRF_TRUSTED_ORIGINS = ['https://*.railway.app']
@@ -41,12 +42,37 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'cloudinary_storage',
+    'cloudinary',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
     'Curso',
     'Empresa',
     'Usuario',
-    'Oferta_Empleo'
+    'Oferta_Empleo',
 ]
+
+SITE_ID = 1
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        # La configuración de la APP se gestiona desde el admin de Django (SocialApp)
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {'access_type': 'online'},
+    }
+}
+
+LOGIN_REDIRECT_URL = '/'
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -56,6 +82,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware'
 ]
 
 ROOT_URLCONF = 'EvES2.urls'
@@ -67,10 +94,6 @@ TEMPLATES = [
         'DIRS': [
             # **CLAVE: Reemplaza os.path.join por el operador / de pathlib**
             BASE_DIR / 'templates',
-            BASE_DIR / 'Usuario',
-            BASE_DIR / 'Empresa',
-            BASE_DIR / 'Curso',
-            BASE_DIR / 'Oferta_Empleo',
         ],
         'APP_DIRS': True,
         'OPTIONS': {

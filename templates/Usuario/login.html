@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load socialaccount %}
 
 {% block title %}Iniciar Sesión - Impulsa Chile{% endblock %}
 
@@ -50,6 +51,16 @@
                         </div>
 
                         <button type="submit" class="btn btn-primary w-100 btn-lg">Ingresar</button>
+
+                        <div class="d-flex align-items-center my-3">
+                            <hr class="flex-grow-1">
+                            <span class="px-3 text-muted">o</span>
+                            <hr class="flex-grow-1">
+                        </div>
+
+                        <a href="{% provider_login_url 'google' %}" class="btn btn-outline-secondary w-100">
+                            <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo" width="20" class="me-2"> Ingresar con Google
+                        </a>
                     </form>
                     <p class="text-center mt-3">
                         ¿Aún no tienes una cuenta? <a href="{% url 'trabajador-register' %}">Regístrate</a>
