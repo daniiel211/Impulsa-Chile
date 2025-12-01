@@ -8,6 +8,6 @@ gunicorn
 sqlparse
 tzdata
 asgiref
-
+requests
 # Dependencies for other packages (e.g., mysqlclient)
 cryptography

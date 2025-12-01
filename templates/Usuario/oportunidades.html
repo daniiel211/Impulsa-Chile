@@ -1,0 +1,25 @@
+<div class="container">
+    <h2>Buscador de Licitaciones del Estado</h2>
+    <form method="get">
+        <input type="text" name="q" value="{{ query }}" placeholder="Ej: Computación, Aseo, Construcción...">
+        <button type="submit">Buscar Oportunidades de Hoy</button>
+    </form>
+
+    <hr>
+
+    {% if oportunidades %}
+        <div class="lista-resultados">
+            {% for op in oportunidades %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ op.nombre }}</h5>
+                        <p class="card-text">Cierra el: {{ op.cierre }}</p>
+                        <a href="{{ op.link }}" target="_blank" class="btn btn-primary">Ver en Mercado Público</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% elif query %}
+        <p>No se encontraron licitaciones activas hoy para "{{ query }}".</p>
+    {% endif %}
+</div>

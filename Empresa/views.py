@@ -1,5 +1,7 @@
 from django.urls import reverse_lazy
+from django.shortcuts import render
 from django.db.models import Q
+from .services import obtener_licitaciones_del_dia
 from django.views.generic import (
     ListView,
     DetailView,
@@ -127,3 +129,17 @@ class EmpresaDeleteView(DeleteView):
     model = Empresa
     template_name = 'Empresa/empresa_confirm_delete.html'
     success_url = reverse_lazy('empresa-list')
+
+
+def buscador_oportunidades(request):
+    oportunidades = []
+    query = request.GET.get('q', '') # Lo que el usuario escribe en el buscador
+    
+    if query:
+        # Llamamos a nuestro servicio
+        oportunidades = obtener_licitaciones_del_dia(filtro_palabra_clave=query)
+    
+    return render(request, 'oportunidades.html', {
+        'oportunidades': oportunidades,
+        'query': query
+    })

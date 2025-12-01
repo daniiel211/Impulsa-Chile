@@ -28,6 +28,7 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=bool)
 MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiZGFuaWllbDIxMSIsImEiOiJjbWluYWU5cmwyOXV1M2twc3QyMDRoOHlyIn0.OElPUaG3hQ9O979kUAYVoA'
+MERCADO_PUBLICO_TICKET = os.getenv('MERCADO_PUBLICO_TICKET', 'F8537A18-6766-4DEF-9E59-426B4FEE2844')
 ALLOWED_HOSTS = config('ALLOWED_HOSTS','impulsa-chile-production-ae96.up.railway.app', cast=Csv())
 #SECURE_SSL_REDIRECT = True
 CSRF_TRUSTED_ORIGINS = ['https://*.railway.app']
@@ -71,7 +72,12 @@ CLOUDINARY_STORAGE = {
     'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
     'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
 }
-
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocalMemoryCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 MIDDLEWARE = [
