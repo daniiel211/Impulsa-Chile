@@ -6,10 +6,12 @@ from .views import (
     EmpresaUpdateView,
     EmpresaDeleteView,
     FeaturedEmpresaDetailView,
+    empresa_dashboard_view,
 )
 
 urlpatterns = [
     path('', EmpresaListView.as_view(), name='empresa-list'),
+    path('dashboard/', empresa_dashboard_view, name='empresa-dashboard'),
     path('nueva/', EmpresaCreateView.as_view(), name='empresa-create'),
     path('<int:pk>/', EmpresaDetailView.as_view(), name='empresa-detail'),
     path('<int:pk>/editar/', EmpresaUpdateView.as_view(), name='empresa-update'),

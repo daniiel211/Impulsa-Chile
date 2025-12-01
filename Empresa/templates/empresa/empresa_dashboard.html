@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard de {{ empresa.razon_social }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2">Dashboard de Empresa</h1>
+            <p class="text-muted">Bienvenido, {{ empresa.razon_social }}</p>
+        </div>
+        <a href="{% url 'ofertaempleo-create' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Crear Nueva Oferta
+        </a>
+    </div>
+
+    <!-- Fila de Estadísticas Clave -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-header">Total de Ofertas Publicadas</div>
+                <div class="card-body">
+                    <h4 class="card-title">{{ total_ofertas }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">Ofertas Activas</div>
+                <div class="card-body">
+                    <h4 class="card-title">{{ ofertas_abiertas }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-secondary mb-3">
+                <div class="card-header">Ofertas Cerradas</div>
+                <div class="card-body">
+                    <h4 class="card-title">{{ ofertas_cerradas }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fila de Actividad Reciente -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    Tus Últimas Ofertas Publicadas
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for oferta in ofertas_recientes %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <a href="{% url 'ofertaempleo-detail' oferta.pk %}">{{ oferta.titulo }}</a>
+                            <small class="d-block text-muted">
+                                Estado: {{ oferta.get_estado_display }} | Publicada el: {{ oferta.fecha_publicacion|date:"d M, Y" }}
+                            </small>
+                        </div>
+                        <div>
+                            <a href="{% url 'ofertaempleo-update' oferta.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                        </div>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item text-center text-muted">
+                        Aún no has publicado ninguna oferta. <a href="{% url 'ofertaempleo-create' %}">¡Crea tu primera oferta ahora!</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

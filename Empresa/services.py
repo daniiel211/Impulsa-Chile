@@ -42,6 +42,12 @@ def _consultar_api_mercado_publico():
         
         # La API devuelve un objeto con metadata, la lista está en 'Listado'
         lista_licitaciones = data.get('Listado', [])
+
+        # Log para depuración: ¿qué nos está devolviendo la API?
+        if not lista_licitaciones:
+            logger.warning(f"La API de Mercado Público no devolvió licitaciones en 'Listado'. Respuesta completa: {data}")
+        else:
+            logger.info(f"API devolvió {len(lista_licitaciones)} licitaciones.")
         
         # 4. Guardamos en caché si la lista no está vacía
         if lista_licitaciones:
@@ -71,9 +77,11 @@ def buscar_licitaciones(filtro_palabra_clave=None):
     if not lista_completa:
         return []
 
-    # Si no hay filtro, retornamos todo (Opcional: podrías limitar a las primeras 20)
+    # Si no hay filtro, retornamos las primeras 20 para no saturar la página inicial.
+    # Formateamos solo las que necesitamos.
     if not filtro_palabra_clave:
-        return _formatear_datos(lista_completa[:20]) # Limitamos a 20 para no saturar
+        resultados_limitados = lista_completa[:20]
+        return _formatear_datos(resultados_limitados)
 
     palabra = filtro_palabra_clave.lower()
     
