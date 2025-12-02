@@ -119,12 +119,12 @@ class EmpresaDetailView(DetailView):
         ctx['roles_list'] = roles
         return ctx
 
-class EmpresaCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+class EmpresaCreateView(LoginRequiredMixin, CreateView):
     model = Empresa
     fields = ['industria', 'rut', 'razon_social', 'descripcion', 'ubicacion_texto', 'tamano_rango', 'por_que_elegirla', 'roles_clave']
     template_name = 'empresa/empresa_form.html'
     success_url = reverse_lazy('empresa-list')
-    permission_required = 'Empresa.add_empresa'
+
 
     def form_valid(self, form):
         form.instance.usuario = self.request.user
