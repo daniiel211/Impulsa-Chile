@@ -244,7 +244,8 @@ def profile_update(request):
         if not idiomas:
             messages.warning(request, 'Ingresa al menos un idioma.')
         else:
-            trabajador.resumen_profesional = (trabajador.resumen_profesional or '') + f"\n\nIdiomas:\n- {idiomas.replace(',', '\n- ')}"
+            idiomas_formatted = idiomas.replace(',', '\n- ')
+            trabajador.resumen_profesional = (trabajador.resumen_profesional or '') + f"\n\nIdiomas:\n- {idiomas_formatted}"
             trabajador.save()
             messages.success(request, 'Idiomas añadidos al perfil.')
 
@@ -253,7 +254,8 @@ def profile_update(request):
         if not preferencias:
             messages.warning(request, 'Ingresa tus preferencias de aprendizaje.')
         else:
-            trabajador.resumen_profesional = (trabajador.resumen_profesional or '') + f"\n\nPreferencias de aprendizaje:\n- {preferencias.replace(',', '\n- ')}"
+            preferencias_formatted = preferencias.replace(',', '\n- ')
+            trabajador.resumen_profesional = (trabajador.resumen_profesional or '') + f"\n\nPreferencias de aprendizaje:\n- {preferencias_formatted}"
             trabajador.save()
             messages.success(request, 'Preferencias de aprendizaje guardadas.')
 
