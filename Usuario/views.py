@@ -59,14 +59,8 @@ def empresa_register(request):
         empresa_form = EmpresaRegistrationForm(request.POST)
 
         if user_form.is_valid() and empresa_form.is_valid():
-            cd = user_form.cleaned_data
-            new_user = User.objects.create_user(
-                username=cd['username'],
-                email=cd['email'],
-                password=cd['password'],
-                first_name=cd['first_name'],
-                last_name=cd['last_name'],
-            )
+            # Guardar el usuario usando el método save() del formulario
+            new_user = user_form.save()
 
             empresa = empresa_form.save(commit=False)
             empresa.usuario = new_user
