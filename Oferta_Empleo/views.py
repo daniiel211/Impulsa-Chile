@@ -275,4 +275,4 @@ def dashboard_ofertas_view(request):
         'ofertas_recientes': ofertas_recientes,
     }
 
-    return render(request, 'Oferta_Empleo/dashboard_ofertas.html', context)
+    return render(request, 'oferta_empleo/dashboard_ofertas.html', context)
