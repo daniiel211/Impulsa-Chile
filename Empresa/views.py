@@ -74,7 +74,7 @@ FEATURED_SUGGESTIONS = [
 
 class EmpresaListView(ListView):
     model = Empresa
-    template_name = 'Empresa/empresa_list.html'
+    template_name = 'empresa/empresa_list.html'
     context_object_name = 'empresas'
 
     def get_queryset(self):
@@ -91,7 +91,7 @@ class EmpresaListView(ListView):
 
 
 class FeaturedEmpresaDetailView(TemplateView):
-    template_name = 'Empresa/empresa_destacada_detail.html'
+    template_name = 'empresa/empresa_destacada_detail.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -104,7 +104,7 @@ class FeaturedEmpresaDetailView(TemplateView):
 
 class EmpresaDetailView(DetailView):
     model = Empresa
-    template_name = 'Empresa/empresa_detail.html'
+    template_name = 'empresa/empresa_detail.html'
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -122,7 +122,7 @@ class EmpresaDetailView(DetailView):
 class EmpresaCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     model = Empresa
     fields = ['industria', 'rut', 'razon_social', 'descripcion', 'ubicacion_texto', 'tamano_rango', 'por_que_elegirla', 'roles_clave']
-    template_name = 'Empresa/empresa_form.html'
+    template_name = 'empresa/empresa_form.html'
     success_url = reverse_lazy('empresa-list')
     permission_required = 'Empresa.add_empresa'
 
@@ -133,10 +133,10 @@ class EmpresaCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView)
 class EmpresaUpdateView(UpdateView):
     model = Empresa
     fields = ['industria', 'rut', 'razon_social', 'descripcion', 'ubicacion_texto', 'tamano_rango', 'por_que_elegirla', 'roles_clave']
-    template_name = 'Empresa/empresa_form.html'
+    template_name = 'empresa/empresa_form.html'
     success_url = reverse_lazy('empresa-list')
 
 class EmpresaDeleteView(DeleteView):
     model = Empresa
-    template_name = 'Empresa/empresa_confirm_delete.html'
+    template_name = 'empresa/empresa_confirm_delete.html'
     success_url = reverse_lazy('empresa-list')
