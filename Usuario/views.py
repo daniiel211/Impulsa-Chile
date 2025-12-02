@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import logout
-from django.contrib import messages
+from django.contrib.auth import logout, login
+from django.contrib import messages, auth
 from .forms import UserRegistrationForm, TrabajadorProfileForm
 from .forms import EmpresaRegistrationForm
 from Empresa.models import Empresa
@@ -12,6 +12,12 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.decorators import login_required
 from .models import Trabajador, Habilidad, Certificacion
+import json
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+from google.oauth2 import id_token
+from google.auth.transport import requests
+
 
 def register_choice(request):
     return render(request, 'Usuario/register_choice.html')
@@ -109,6 +115,39 @@ class CustomLogoutView(SuccessMessageMixin, LogoutView):
         # 3. Redirige explícitamente a la URL de 'login'.
         # Esto es más seguro que depender de self.next_page, que causaba el error.
         return redirect('login')
+
+@csrf_exempt
+def google_login(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        token = data.get('token')
+
+        # Verifica el token con Google
+        idinfo = id_token.verify_oauth2_token(token, requests.Request(), settings.GOOGLE_CLIENT_ID)
+
+        # Extrae la información del usuario
+        user_email = idinfo['email']
+        user_first_name = idinfo.get('given_name', '')
+        user_last_name = idinfo.get('family_name', '')
+
+        # Busca o crea el usuario en Django
+        user, created = User.objects.get_or_create(email=user_email, defaults={
+            'username': user_email, # Usamos el email como username por simplicidad
+            'first_name': user_first_name,
+            'last_name': user_last_name,
+        })
+
+        # Inicia sesión con el backend de Django
+        login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+        return JsonResponse({'success': True, 'redirect_url': reverse('curso-list')})
+
+    except (ValueError, json.JSONDecodeError):
+        return JsonResponse({'error': 'Solicitud inválida'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': f'Error de autenticación: {str(e)}'}, status=401)
 
 
 @login_required

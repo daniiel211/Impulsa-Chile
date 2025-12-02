@@ -35,6 +35,29 @@
             </div>
           </form>
 
+          <hr>
+
+          <p class="text-center text-muted">O inicia sesión con:</p>
+
+          <!-- Contenedor para el botón de Google -->
+          <div class="d-flex justify-content-center">
+            <div id="g_id_onload"
+                 data-client_id="{{ settings.GOOGLE_CLIENT_ID }}"
+                 data-callback="handleCredentialResponse"
+                 data-context="signin"
+                 data-ux_mode="popup"
+                 data-auto_prompt="false">
+            </div>
+
+            <div class="g_id_signin"
+                 data-type="standard"
+                 data-theme="outline"
+                 data-text="sign_in_with"
+                 data-shape="rectangular"
+                 data-logo_alignment="left">
+            </div>
+          </div>
+
           <div class="text-center mt-3">
             <p class="mb-0 text-muted">
               ¿Aún no tienes una cuenta? 
@@ -46,4 +69,27 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Librería de Google Identity Services -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+function handleCredentialResponse(response) {
+    // La vista 'google_login' tiene @csrf_exempt, por lo que no necesitamos el token CSRF aquí.
+    fetch("{% url 'google-login' %}", {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: response.credential }),
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = data.redirect_url; // Redirige a la página de cursos
+        } else {
+            alert('Error al iniciar sesión con Google: ' + data.error);
+        }
+    });
+}
+</script>
 {% endblock %}

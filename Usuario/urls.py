@@ -8,6 +8,7 @@ urlpatterns = [
     path('register/empresa/', views.empresa_register, name='empresa-register'),
     path('login/', views.CustomLoginView.as_view(), name='login'),
     # Añadimos el `next_page` aquí para asegurar la redirección.
+    path('google-login/', views.google_login, name='google-login'),
     path('logout/', views.CustomLogoutView.as_view(next_page=reverse_lazy('login')), name='logout'),
     path('perfil/habilidades/agregar/', views.add_habilidades, name='usuario-add-habilidades'),
     path('perfil/actualizar/', views.profile_update, name='usuario-profile-update'),
