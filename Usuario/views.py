@@ -2,12 +2,19 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import logout
 from django.contrib import messages
 from .forms import UserRegistrationForm, TrabajadorProfileForm
+from .forms import EmpresaRegistrationForm
+from Empresa.models import Empresa
+from Empresa.models import Industria
+from django.contrib.auth.models import User
 from django.http import HttpRequest, HttpResponse, JsonResponse
-from django.urls import reverse_lazy
-from django.contrib.auth.views import LogoutView
+from django.urls import reverse_lazy, reverse
 from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.decorators import login_required
 from .models import Trabajador, Habilidad, Certificacion
+
+def register_choice(request):
+    return render(request, 'Usuario/register_choice.html')
 
 def trabajador_register(request):
     if request.method == 'POST':
@@ -15,12 +22,8 @@ def trabajador_register(request):
         profile_form = TrabajadorProfileForm(request.POST, request.FILES)
         
         if user_form.is_valid() and profile_form.is_valid():
-            # Crear el objeto User pero no guardarlo en la base de datos todavía
-            new_user = user_form.save(commit=False)
-            # Establecer la contraseña elegida
-            new_user.set_password(user_form.cleaned_data['password'])
-            # Guardar el objeto User
-            new_user.save()
+            # Guardar el usuario. El método save() de UserCreationForm se encarga de la contraseña.
+            new_user = user_form.save()
             
             # Crear el perfil del trabajador
             profile = profile_form.save(commit=False)
@@ -36,6 +39,40 @@ def trabajador_register(request):
         profile_form = TrabajadorProfileForm()
     return render(request, 'Usuario/register.html', {'user_form': user_form, 'profile_form': profile_form})
 
+def empresa_register(request):
+    # Semillas de industrias si no existen
+    if not Industria.objects.exists():
+        for nombre in [
+            'Tecnología', 'Salud', 'Educación', 'Retail', 'Manufactura',
+            'Agroindustria', 'Finanzas', 'Construcción', 'Servicios Profesionales', 'Logística'
+        ]:
+            Industria.objects.get_or_create(nombre_industria=nombre)
+
+    if request.method == 'POST':
+        user_form = UserRegistrationForm(request.POST)
+        empresa_form = EmpresaRegistrationForm(request.POST)
+
+        if user_form.is_valid() and empresa_form.is_valid():
+            cd = user_form.cleaned_data
+            new_user = User.objects.create_user(
+                username=cd['username'],
+                email=cd['email'],
+                password=cd['password'],
+                first_name=cd['first_name'],
+                last_name=cd['last_name'],
+            )
+
+            empresa = empresa_form.save(commit=False)
+            empresa.usuario = new_user
+            empresa.save()
+
+            messages.success(request, '¡Tu empresa fue registrada exitosamente! Ya puedes iniciar sesión.')
+            return redirect('login')
+    else:
+        user_form = UserRegistrationForm()
+        empresa_form = EmpresaRegistrationForm()
+    return render(request, 'Usuario/register_empresa.html', {'user_form': user_form, 'empresa_form': empresa_form})
+
 def employeeView(request) :
     emp = {
         'id':123,
@@ -44,6 +81,18 @@ def employeeView(request) :
         'salary' : '5000'
     }
     return JsonResponse (emp)
+
+class CustomLoginView(LoginView):
+    template_name = 'Usuario/login.html'
+
+    def form_valid(self, form):
+        # Llama al método original para loguear al usuario
+        response = super().form_valid(form)
+        
+        # Si el checkbox "remember_me" está marcado, la sesión no expira al cerrar el navegador.
+        if not self.request.POST.get('remember_me', None):
+            self.request.session.set_expiry(0) # Expira al cerrar el navegador
+        return response
 
 class CustomLogoutView(SuccessMessageMixin, LogoutView):
     success_message = "Has cerrado sesión exitosamente."

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Mapa de Ofertas de Empleo{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Mapa de Ofertas de Empleo</h1>
+
+    <!-- Incluir Mapbox GL JS y CSS -->
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css' rel='stylesheet' />
+
+    <div id='map' style='width: 100%; height: 600px;'></div>
+
+    <script>
+        // Pasamos las variables de Django a JavaScript
+        const mapboxAccessToken = "{{ mapbox_access_token }}";
+        // Parseamos el JSON de ofertas que viene serializado desde la vista
+        const ofertasData = JSON.parse('{{ ofertas_json|escapejs }}');
+
+        mapboxgl.accessToken = mapboxAccessToken;
+        const map = new mapboxgl.Map({
+            container: 'map', // ID del contenedor del mapa
+            style: 'mapbox://styles/mapbox/streets-v11', // Estilo del mapa
+            center: [-71.5518, -35.6751], // Centro inicial del mapa [lng, lat] (Chile)
+            zoom: 4 // Zoom inicial
+        });
+
+        // Añadir controles de navegación (zoom, rotación)
+        map.addControl(new mapboxgl.NavigationControl());
+
+        // Iterar sobre cada oferta y añadir un marcador al mapa
+        ofertasData.forEach(oferta => {
+            const { pk, fields } = oferta;
+            const { titulo, latitud, longitud, direccion_texto } = fields;
+
+            if (latitud && longitud) {
+                // Crear el contenido del popup
+                const popupContent = `
+                    <div>
+                        <h5>${titulo}</h5>
+                        <p>${direccion_texto || 'Dirección no especificada'}</p>
+                        <a href="/ofertas/${pk}/" class="btn btn-sm btn-primary">Ver detalle</a>
+                    </div>
+                `;
+
+                // Crear un popup
+                const popup = new mapboxgl.Popup({ offset: 25 })
+                    .setHTML(popupContent);
+
+                // Crear un marcador para la oferta y añadirlo al mapa
+                new mapboxgl.Marker()
+                    .setLngLat([longitud, latitud])
+                    .setPopup(popup) // Asignar el popup al marcador
+                    .addTo(map);
+            }
+        });
+    </script>
+</div>
+{% endblock %}

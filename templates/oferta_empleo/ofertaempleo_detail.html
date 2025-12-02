@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Detalle de Oferta: {{ object.titulo }}</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-color: #007bff;
+        --primary-hover-color: #0056b3;
+        --secondary-color: #6c757d;
+        --secondary-hover-color: #5a6268;
+        --danger-color: #dc3545;
+        --danger-hover-color: #c82333;
+        --background-color: #f4f7f6;
+        --container-bg-color: #ffffff;
+        --text-color: #333;
+        --label-color: #555;
+        --border-color: #e9ecef;
+      }
+      body {
+        font-family: "Roboto", sans-serif;
+        margin: 0;
+        background-color: var(--background-color);
+        color: var(--text-color);
+        padding: 2em;
+        box-sizing: border-box;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background-color: var(--container-bg-color);
+        padding: 2.5em;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      }
+      h1 {
+        font-size: 2.5em;
+        font-weight: 700;
+        margin-top: 0;
+        margin-bottom: 0.25em;
+      }
+      h2 {
+        font-size: 1.5em;
+        font-weight: 400;
+        color: var(--label-color);
+        margin-top: 0;
+        margin-bottom: 1.5em;
+      }
+      h3 {
+        font-size: 1.25em;
+        font-weight: 700;
+        border-bottom: 2px solid var(--border-color);
+        padding-bottom: 0.5em;
+        margin-top: 2em;
+        margin-bottom: 1em;
+      }
+      .job-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5em;
+        margin-bottom: 2em;
+        padding: 1em;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+      }
+      .job-meta p {
+        margin: 0;
+      }
+      .description {
+        line-height: 1.7;
+        color: var(--label-color);
+      }
+      .actions {
+        margin-top: 2.5em;
+        padding-top: 1.5em;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        gap: 1em;
+      }
+      .btn {
+        text-decoration: none;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-weight: 500;
+        transition: background-color 0.3s;
+        display: inline-block;
+        text-align: center;
+      }
+      .btn-primary { background-color: var(--primary-color); }
+      .btn-primary:hover { background-color: var(--primary-hover-color); }
+      .btn-danger { background-color: var(--danger-color); }
+      .btn-danger:hover { background-color: var(--danger-hover-color); }
+      .btn-secondary { background-color: var(--secondary-color); }
+      .btn-secondary:hover { background-color: var(--secondary-hover-color); }
+      a { color: var(--primary-color); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+    <h1>{{ object.titulo }}</h1>
+    <h2><a href="{% url 'empresa-detail' object.empresa.pk %}">{{ object.empresa.razon_social }}</a></h2>
+    <div class="job-meta">
+      <p><strong>Ubicación:</strong> {{ object.region.nombre_region }}</p>
+      <p><strong>Contrato:</strong> {{ object.tipo_contrato.nombre_contrato|default:"No especificado" }}</p>
+      <p><strong>Estado:</strong> {{ object.get_estado_display }}</p>
+      <p><strong>Publicado:</strong> {{ object.fecha_publicacion|date:"d/m/Y" }}</p>
+    </div>
+    <h3>Descripción del Puesto</h3>
+    <div class="description">{{ object.descripcion|linebreaksbr }}</div>
+    <div class="actions">
+      {% if user.is_authenticated %}
+        <a href="{% url 'ofertaempleo-update' object.pk %}" class="btn btn-primary">Editar</a>
+        <a href="{% url 'ofertaempleo-delete' object.pk %}" class="btn btn-danger">Eliminar</a>
+      {% endif %}
+      <a href="{% url 'ofertaempleo-list' %}" class="btn btn-secondary">Volver al listado</a>
+    </div>
+    </div>
+  </body>
+</html>

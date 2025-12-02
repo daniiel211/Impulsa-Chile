@@ -1,0 +1,1 @@
+web: gunicorn EvES2.wsgi

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Listado de Trabajadores</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        margin: 2em;
+      }
+      a {
+        text-decoration: none;
+        color: #007bff;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      ul {
+        list-style-type: none;
+        padding: 0;
+      }
+      li {
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Perfiles de Trabajadores</h1>
+    <ul>
+      {% for trabajador in trabajadores %}
+      <li>
+        <a href="{% url 'trabajador-detail' trabajador.pk %}"
+          >{{ trabajador.usuario.username }}</a
+        >
+        -
+        <a href="{% url 'trabajador-update' trabajador.pk %}">Editar Perfil</a>
+        -
+        <a href="{% url 'trabajador-delete' trabajador.pk %}"
+          >Eliminar Perfil</a
+        >
+      </li>
+      {% empty %}
+      <li>No hay perfiles de trabajadores registrados.</li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>

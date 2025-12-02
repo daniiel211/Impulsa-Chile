@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirmar Eliminación</title>
+    <style>
+        body { font-family: sans-serif; margin: 2em; }
+        .btn-danger { background-color: #dc3545; color: white; padding: 10px 15px; border: none; cursor: pointer; }
+        .btn-danger:hover { background-color: #c82333; }
+        a { text-decoration: none; color: #007bff; }
+    </style>
+</head>
+<body>
+    <h1>Eliminar Empresa</h1>
+    <p>¿Estás seguro de que quieres eliminar la empresa "<strong>{{ object.razon_social }}</strong>"?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn-danger">Sí, eliminar</button>
+        <a href="{% url 'empresa-detail' object.pk %}">Cancelar</a>
+    </form>
+</body>
+</html>

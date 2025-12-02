@@ -77,7 +77,7 @@
               <li class="nav-item"><a class="nav-link" href="{% url 'usuario-perfil-resumen' %}"><i class="bi bi-person"></i> Tu perfil</a></li>
               <li class="nav-item"><a class="btn btn-outline-secondary btn-sm ms-lg-2" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a></li>
             {% else %}
-              <li class="nav-item"><a class="nav-link" href="{% url 'trabajador-register' %}">Registrarse</a></li>
+              <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#registerChoiceModal">Registrarse</a></li>
               <li class="nav-item"><a class="btn btn-gradient btn-sm ms-lg-2" href="{% url 'login' %}"><i class="bi bi-person"></i> Ingresar</a></li>
             {% endif %}
           </ul>
@@ -93,7 +93,11 @@
         <a href="{% url 'curso-list' %}"><i class="bi bi-book-half me-1"></i> Cursos</a>
         {% endif %}
         <a href="{% url 'empresa-list' %}"><i class="bi bi-building me-1"></i> Empresas</a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'ofertaempleo-dashboard' %}"><i class="bi bi-briefcase-fill me-1"></i> Empleo</a>
+        {% else %}
         <a href="{% url 'ofertaempleo-list' %}"><i class="bi bi-briefcase-fill me-1"></i> Ofertas de empleo</a>
+        {% endif %}
       </div>
     </div>
 
@@ -173,5 +177,23 @@
         }
       })();
     </script>
+    <!-- Modal elección de registro -->
+    <div class="modal fade" id="registerChoiceModal" tabindex="-1" aria-labelledby="registerChoiceLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="registerChoiceLabel">¿Cómo quieres registrarte?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p class="text-muted mb-3">Elige si deseas crear tu cuenta como Trabajador o como Empresa.</p>
+            <div class="d-flex flex-column gap-2">
+              <a href="{% url 'trabajador-register' %}" class="btn btn-gradient">Registrarme como Trabajador</a>
+              <a href="{% url 'empresa-register' %}" class="btn btn-outline-primary">Registrarme como Empresa</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

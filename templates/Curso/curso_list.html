@@ -1,0 +1,323 @@
+{% extends 'Base.html' %}
+{% block title %}{% if user.is_authenticated %}Tu perfil{% else %}Cursos{% endif %} | Impulsa Chile{% endblock %}
+{% block content %}
+  <style>
+    /* Diseño mejorado, sólo estilos (scoped) */
+    .curso-page { --primary: #2563eb; --accent: #7c3aed; --bg-soft: #f8fafc; }
+    .curso-page .section-title { font-weight: 700; letter-spacing: 0.2px; }
+    .curso-page .card { border-radius: 16px; border: 1px solid #e9ecef; }
+    .curso-page .card-body { padding: 1.75rem; }
+    .curso-page .chip { border-radius: 20px; padding: 6px 12px; font-weight: 500; }
+    .curso-page .section-card { background: #fff; border: 1px solid #eef2f7; border-radius: 14px; box-shadow: 0 4px 14px rgba(20,20,20,0.06); }
+    .curso-page .section-card h2 { font-weight: 600; }
+    .curso-page .form-control { border-radius: 12px; }
+    .curso-page .btn-gradient { background: linear-gradient(90deg, var(--primary), var(--accent)); color: #fff; border: none; }
+    .curso-page .btn-gradient:hover { filter: brightness(1.05); }
+    .curso-page .list-group-item { border-radius: 12px; margin-bottom: 8px; }
+    .curso-page .list-group-item a.fw-semibold { color: #111827; }
+    .curso-page .alert-light { border-radius: 12px; }
+
+    .curso-page .list-group-item:hover { background: var(--bg-soft); transform: translateY(-1px); transition: all .15s ease; }
+  </style>
+  <div class="curso-page">  
+    <div class="row g-4">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          {% if user.is_authenticated %}
+          <h1 class="h4 mb-2 section-title">Hola, {{ user.get_username }} 👋</h1>
+          {% else %}
+          <h1 class="h4 mb-2 section-title">Cursos</h1>
+          <p class="text-muted mb-3">Explora cursos para potenciar tu perfil.</p>
+          {% endif %}
+          {% if user.is_authenticated %}
+            <p class="text-muted mb-3">Sugerencias para potenciar tu perfil:</p>
+            <div class="d-flex flex-wrap gap-2 mb-3">
+              <span class="badge text-bg-light border chip">Habilidades blandas</span>
+              <span class="badge text-bg-light border chip">Comunicación y liderazgo</span>
+              <span class="badge text-bg-light border chip">Gestión de proyectos</span>
+            </div>
+            <ul class="list-unstyled small text-muted mb-4">
+              <li>• Define objetivos de aprendizaje y un plan semanal.</li>
+              <li>• Prioriza cursos cortos para lograr contrataciones rápidas.</li>
+              <li>• Documenta habilidades y añade certificaciones a tu perfil.</li>
+            </ul>
+
+            {% if user_habilidades %}
+              <div class="mb-3">
+                <h2 class="h6 mb-2">Tus habilidades</h2>
+                <div class="d-flex flex-wrap gap-2">
+                  {% for h in user_habilidades %}
+                    <span class="badge text-bg-light border chip">{{ h.nombre_habilidad }}</span>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
+
+            <div class="p-3 border rounded mb-3 section-card">
+              <h2 class="h6 mb-2">Agrega tus habilidades</h2>
+              <form method="post" action="{% url 'usuario-add-habilidades' %}" class="row g-2">
+                {% csrf_token %}
+                <div class="col-12 col-md-9">
+                  <label for="habilidades_text" class="form-label small text-muted mb-1">Ingresa habilidades separadas por coma</label>
+                  <input type="text" id="habilidades_text" name="habilidades_text" class="form-control" placeholder="Ej: liderazgo, comunicación estratégica, gestión de proyectos (PMI)" required />
+                </div>
+                <div class="col-12 col-md-3 d-flex align-items-end">
+                  <button type="submit" class="btn btn-gradient w-100"><i class="bi bi-plus-circle"></i> Guardar habilidades</button>
+                </div>
+              </form>
+              <p class="small text-muted mt-2 mb-0">Se guardarán en tu perfil y podrás usarlas para orientar tu aprendizaje.</p>
+            </div>
+
+            <div class="p-3 border rounded mb-3 section-card">
+              <h2 class="h6 mb-2">Completa tu resumen profesional</h2>
+              <form method="post" action="{% url 'usuario-profile-update' %}" class="row g-2">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="resumen">
+                <div class="col-12">
+                  <textarea name="resumen_profesional" rows="3" class="form-control" placeholder="Describe tu experiencia, logros e intereses" required>{% if trabajador and trabajador.resumen_profesional %}{{ trabajador.resumen_profesional }}{% endif %}</textarea>
+                </div>
+                <div class="col-12 col-md-3 ms-auto d-flex align-items-end">
+                  <button type="submit" class="btn btn-gradient w-100"><i class="bi bi-save"></i> Guardar resumen</button>
+                </div>
+              </form>
+            </div>
+
+            <div class="p-3 border rounded mb-3 section-card">
+              <h2 class="h6 mb-2">Sube tu CV (PDF)</h2>
+              <form method="post" action="{% url 'usuario-profile-update' %}" enctype="multipart/form-data" class="row g-2">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="cv">
+                <div class="col-12 col-md-9">
+                  <input type="file" name="cv" accept="application/pdf" class="form-control" required />
+                  {% if trabajador and trabajador.cv %}
+                    <p class="small text-muted mt-2 mb-0">CV cargado.</p>
+                  {% else %}
+                    <p class="small text-muted mt-2 mb-0">Aún no has subido tu CV.</p>
+                  {% endif %}
+                </div>
+                <div class="col-12 col-md-3 d-flex align-items-end">
+                  <button type="submit" class="btn btn-gradient w-100"><i class="bi bi-upload"></i> Subir CV</button>
+                </div>
+              </form>
+            </div>
+
+            <div class="p-3 border rounded mb-3 section-card">
+              <h2 class="h6 mb-2">Certificaciones</h2>
+              <form method="post" action="{% url 'usuario-profile-update' %}" enctype="multipart/form-data" class="row g-2">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="certificacion">
+                <div class="col-12 col-md-9">
+                  <textarea name="certificaciones_text" rows="3" class="form-control" placeholder="Nombre o notas de la certificación (opcional)"></textarea>
+                  <div class="mt-2">
+                    <input type="file" name="certificacion_file" accept="application/pdf,image/*" class="form-control" />
+                  </div>
+                  <p class="small text-muted mt-2 mb-0">Puedes añadir el archivo del certificado (PDF o imagen).</p>
+                </div>
+                <div class="col-12 col-md-3 d-flex align-items-end">
+                  <button type="submit" class="btn btn-gradient w-100"><i class="bi bi-award"></i> Añadir certificaciones</button>
+                </div>
+              </form>
+            </div>
+
+            <div class="p-3 border rounded mb-3 section-card">
+              <h2 class="h6 mb-2">Proyectos destacados</h2>
+              <form method="post" action="{% url 'usuario-profile-update' %}" class="row g-2">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="proyectos">
+                <div class="col-12">
+                  <textarea name="proyectos_text" rows="3" class="form-control" placeholder="Ej: Dashboard ejecutivo de indicadores; Automatización de reportes; Panel de BI" required></textarea>
+                </div>
+                <div class="col-12 col-md-3 ms-auto d-flex align-items-end">
+                  <button type="submit" class="btn btn-gradient w-100"><i class="bi bi-stars"></i> Añadir proyectos</button>
+                </div>
+              </form>
+            </div>
+
+            <div class="p-3 border rounded mb-3">
+              <h2 class="h6 mb-2">Idiomas</h2>
+              <form method="post" action="{% url 'usuario-profile-update' %}" class="row g-2">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="idiomas">
+                <div class="col-12 col-md-9">
+                  <input type="text" name="idiomas_text" class="form-control" placeholder="Ej: Español (nativo), Inglés (B2), Portugués (A2)" required>
+                </div>
+                <div class="col-12 col-md-3 d-flex align-items-end">
+                  <button type="submit" class="btn btn-gradient w-100"><i class="bi bi-translate"></i> Guardar idiomas</button>
+                </div>
+              </form>
+            </div>
+
+            <div class="p-3 border rounded mb-3">
+              <h2 class="h6 mb-2">Preferencias de aprendizaje</h2>
+              <form method="post" action="{% url 'usuario-profile-update' %}" class="row g-2">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="preferencias">
+                <div class="col-12 col-md-9">
+                  <input type="text" name="preferencias_text" class="form-control" placeholder="Ej: 3h/semana; cursos cortos; enfoque práctico; habilidades blandas primero" required>
+                </div>
+                <div class="col-12 col-md-3 d-flex align-items-end">
+                  <button type="submit" class="btn btn-gradient w-100"><i class="bi bi-journal-check"></i> Guardar preferencias</button>
+                </div>
+              </form>
+            </div>
+
+            <div class="p-3 border rounded mb-0 section-card">
+              <h2 class="h6 mb-2">Plan semanal recomendado</h2>
+              <ul class="small text-muted mb-0">
+                <li>• 3h: Habilidades blandas (comunicación, liderazgo).</li>
+                <li>• 2h: Analítica de datos y BI (herramientas profesionales).</li>
+                <li>• 1h: Gestión de proyectos (metodologías y prácticas).</li>
+              </ul>
+            </div>
+
+            
+
+            <div class="border-top pt-3">
+              <div class="d-flex align-items-center justify-content-between">
+                <h2 class="h6 text-muted mb-2">¿Deseas publicar cursos?</h2>
+                <a class="btn btn-outline-primary btn-sm" data-bs-toggle="collapse" href="#createCourse" role="button" aria-expanded="false" aria-controls="createCourse">
+                  Mostrar formulario
+                </a>
+              </div>
+              <div class="collapse" id="createCourse">
+                <form method="post" action="{% url 'curso-create' %}" class="row g-3 mt-2">
+                  {% csrf_token %}
+                  <div class="col-md-6">
+                    <label for="titulo" class="form-label">Título</label>
+                    <input type="text" id="titulo" name="titulo" class="form-control" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="duracion_horas" class="form-label">Duración (horas)</label>
+                    <input type="number" id="duracion_horas" name="duracion_horas" class="form-control" min="0">
+                  </div>
+                  <div class="col-12">
+                    <label for="descripcion" class="form-label">Descripción</label>
+                    <textarea id="descripcion" name="descripcion" rows="3" class="form-control"></textarea>
+                  </div>
+                  <div class="col-12">
+                    <label for="url_contenido" class="form-label">Enlace al contenido</label>
+                    <input type="url" id="url_contenido" name="url_contenido" class="form-control">
+                  </div>
+                  <div class="col-12 d-flex gap-2">
+                    <button type="submit" class="btn btn-gradient">Guardar</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          {% else %}
+            <div class="mb-0">
+              <p class="text-muted mb-2">Capacítate y potencia tus habilidades.</p>
+              <div class="d-flex flex-wrap gap-2 mb-3">
+                <span class="badge text-bg-light border chip">Habilidades blandas</span>
+                <span class="badge text-bg-light border chip">Analítica de datos y BI</span>
+                <span class="badge text-bg-light border chip">Gestión de proyectos</span>
+                <span class="badge text-bg-light border chip">Comunicación efectiva</span>
+              </div>
+              <div class="alert alert-light border mb-0">
+                ¿Quieres personalizar tu perfil y publicar cursos?
+                <a class="btn btn-gradient btn-sm ms-2" href="{% url 'login' %}">Inicia sesión y descubre más</a>
+                <a href="{% url 'curso-list' %}" class="btn btn-link btn-sm text-decoration-none">Ver cursos</a>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <ul class="list-group">
+        {% for curso in cursos %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <a href="{% url 'curso-detail' curso.pk %}" class="fw-semibold">{{ curso.titulo }}</a>
+          <span class="text-nowrap">
+            {% if user.is_authenticated %}
+              {% if perms.Curso.change_curso %}
+                <a href="{% url 'curso-update' curso.pk %}" class="btn btn-sm btn-outline-primary">Editar</a>
+              {% endif %}
+              {% if perms.Curso.delete_curso %}
+                <a href="{% url 'curso-delete' curso.pk %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
+              {% endif %}
+            {% endif %}
+          </span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <script>
+  // Validaciones de cliente: bloquea envíos vacíos y muestra advertencias.
+  (function(){
+    function showAlert(form, message){
+      let alert = form.querySelector('.client-alert');
+      if(!alert){
+        alert = document.createElement('div');
+        alert.className = 'alert alert-warning client-alert mt-2';
+        alert.role = 'alert';
+        // Insertar al final del formulario
+        form.appendChild(alert);
+      }
+      alert.textContent = message;
+      alert.style.display = 'block';
+    }
+
+    function attachValidation(fieldSelector, validateFn, message){
+      const field = document.querySelector(fieldSelector);
+      if(!field) return;
+      const form = field.closest('form');
+      if(!form) return;
+      form.addEventListener('submit', function(e){
+        const ok = validateFn(field, form);
+        if(!ok){
+          e.preventDefault();
+          showAlert(form, message);
+        }
+      });
+    }
+
+    // Habilidades: no vacío
+    attachValidation('[name="habilidades_text"]', (el)=> el.value.trim().length > 0, 'Ingresa al menos una habilidad.');
+
+    // Resumen: no vacío
+    attachValidation('[name="resumen_profesional"]', (el)=> el.value.trim().length > 0, 'El resumen no puede estar vacío.');
+
+    // Certificaciones: requiere texto o archivo
+    (function(){
+      const text = document.querySelector('[name="certificaciones_text"]');
+      const file = document.querySelector('[name="certificacion_file"]');
+      if(!text || !file) return;
+      const form = text.closest('form');
+      form.addEventListener('submit', function(e){
+        const hasText = text.value.trim().length > 0;
+        const hasFile = file.files && file.files.length > 0;
+        if(!hasText && !hasFile){
+          e.preventDefault();
+          showAlert(form, 'Ingresa texto de certificación o selecciona un archivo.');
+        }
+      });
+    })();
+
+    // Proyectos: no vacío
+    attachValidation('[name="proyectos_text"]', (el)=> el.value.trim().length > 0, 'Ingresa al menos un proyecto.');
+
+    // Idiomas: no vacío
+    attachValidation('[name="idiomas_text"]', (el)=> el.value.trim().length > 0, 'Ingresa al menos un idioma.');
+
+    // Preferencias: no vacío
+    attachValidation('[name="preferencias_text"]', (el)=> el.value.trim().length > 0, 'Ingresa tus preferencias de aprendizaje.');
+
+    // CV: requiere archivo
+    (function(){
+      const cv = document.querySelector('[name="cv"]');
+      if(!cv) return;
+      const form = cv.closest('form');
+      form.addEventListener('submit', function(e){
+        if(!(cv.files && cv.files.length > 0)){
+          e.preventDefault();
+          showAlert(form, 'Selecciona un archivo PDF para tu CV.');
+        }
+      });
+    })();
+  })();
+</script>
+{% endblock %}

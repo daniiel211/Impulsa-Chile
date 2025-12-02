@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Iniciar Sesión{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h1 class="h4 mb-3 text-center">Iniciar Sesión</h1>
+          
+          {% if form.errors %}
+            <div class="alert alert-danger" role="alert">
+              Tu nombre de usuario y contraseña no coinciden. Por favor, inténtalo de nuevo.
+            </div>
+          {% endif %}
+
+          <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="id_username" class="form-label">Nombre de usuario</label>
+              <input type="text" name="username" id="id_username" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label for="id_password" class="form-label">Contraseña</label>
+              <input type="password" name="password" id="id_password" class="form-control" required>
+            </div>
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" name="remember_me" id="id_remember_me">
+              <label class="form-check-label" for="id_remember_me">
+                Recordarme
+              </label>
+            </div>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-gradient">Ingresar</button>
+            </div>
+          </form>
+
+          <div class="text-center mt-3">
+            <p class="mb-0 text-muted">
+              ¿Aún no tienes una cuenta? 
+              <a href="#" data-bs-toggle="modal" data-bs-target="#registerChoiceModal">Regístrate</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

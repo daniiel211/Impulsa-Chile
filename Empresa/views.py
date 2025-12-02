@@ -1,7 +1,5 @@
 from django.urls import reverse_lazy
-from django.shortcuts import render
 from django.db.models import Q
-from .services import buscar_licitaciones
 from django.views.generic import (
     ListView,
     DetailView,
@@ -13,8 +11,7 @@ from django.views.generic import (
 from .models import Empresa
 from django.http import Http404
 from django.db.models import Q
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 FEATURED_SUGGESTIONS = [
     {
@@ -109,9 +106,22 @@ class EmpresaDetailView(DetailView):
     model = Empresa
     template_name = 'Empresa/empresa_detail.html'
 
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        e = self.object
+        razones = []
+        roles = []
+        if e.por_que_elegirla:
+            razones = [r.strip() for r in e.por_que_elegirla.splitlines() if r.strip()]
+        if e.roles_clave:
+            roles = [r.strip() for r in e.roles_clave.split(',') if r.strip()]
+        ctx['razones_list'] = razones
+        ctx['roles_list'] = roles
+        return ctx
+
 class EmpresaCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     model = Empresa
-    fields = ['industria', 'rut', 'razon_social', 'descripcion']
+    fields = ['industria', 'rut', 'razon_social', 'descripcion', 'ubicacion_texto', 'tamano_rango', 'por_que_elegirla', 'roles_clave']
     template_name = 'Empresa/empresa_form.html'
     success_url = reverse_lazy('empresa-list')
     permission_required = 'Empresa.add_empresa'
@@ -122,7 +132,7 @@ class EmpresaCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView)
 
 class EmpresaUpdateView(UpdateView):
     model = Empresa
-    fields = ['industria', 'rut', 'razon_social', 'descripcion']
+    fields = ['industria', 'rut', 'razon_social', 'descripcion', 'ubicacion_texto', 'tamano_rango', 'por_que_elegirla', 'roles_clave']
     template_name = 'Empresa/empresa_form.html'
     success_url = reverse_lazy('empresa-list')
 
@@ -130,51 +140,3 @@ class EmpresaDeleteView(DeleteView):
     model = Empresa
     template_name = 'Empresa/empresa_confirm_delete.html'
     success_url = reverse_lazy('empresa-list')
-
-
-def buscador_oportunidades(request):
-    oportunidades = []
-    query = request.GET.get('q', '') # Lo que el usuario escribe en el buscador
-    
-    if query:
-        # Llamamos a nuestro servicio
-        oportunidades = buscar_licitaciones(filtro_palabra_clave=query)
-    
-    return render(request, 'oportunidades.html', {
-        'oportunidades': oportunidades,
-        'query': query
-    })
-
-@login_required
-def empresa_dashboard_view(request):
-    """
-    Dashboard para el usuario de tipo Empresa.
-    Muestra estadísticas y accesos directos relevantes para su propia empresa.
-    """
-    try:
-        # 1. Obtenemos la empresa asociada al usuario logueado
-        empresa = Empresa.objects.get(usuario=request.user)
-    except Empresa.DoesNotExist:
-        # Si el usuario no tiene una empresa, no puede ver este dashboard.
-        # Podrías redirigirlo o mostrar un error. Http404 es una opción segura.
-        raise Http404("No tienes una empresa asociada a tu cuenta.")
-
-    # 2. Filtramos las ofertas de empleo que pertenecen a ESTA empresa
-    ofertas_de_la_empresa = empresa.ofertaempleo_set.all()
-
-    # 3. Calculamos estadísticas específicas
-    total_ofertas = ofertas_de_la_empresa.count()
-    ofertas_abiertas = ofertas_de_la_empresa.filter(estado='AB').count()
-    ofertas_cerradas = ofertas_de_la_empresa.filter(estado='CE').count()
-
-    # 4. Obtenemos las últimas 5 ofertas publicadas por la empresa
-    ofertas_recientes = ofertas_de_la_empresa.order_by('-fecha_publicacion')[:5]
-
-    context = {
-        'empresa': empresa,
-        'total_ofertas': total_ofertas,
-        'ofertas_abiertas': ofertas_abiertas,
-        'ofertas_cerradas': ofertas_cerradas,
-        'ofertas_recientes': ofertas_recientes,
-    }
-    return render(request, 'Empresa/empresa_dashboard.html', context)

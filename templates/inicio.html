@@ -46,30 +46,35 @@
       <div class="card card-hover h-100 border-0 shadow-sm">
         <div class="rounded-top" style="height:4px;background: linear-gradient(135deg,var(--brand-start),var(--brand-end));"></div>
         <div class="card-body">
-          {% if user.is_authenticated %}
-          <i class="bi bi-person fs-1 text-primary"></i>
-          <h5 class="mt-2 mb-2">Tu perfil</h5>
+          {% if es_empresa %}
+            <i class="bi bi-building fs-1 text-primary"></i>
+            <h5 class="mt-2 mb-2">Panel de Empresa</h5>
+            <p class="mb-2 text-muted">{{ empresa_obj.razon_social }}</p>
+            <div class="d-flex gap-2">
+              <a href="{% url 'ofertaempleo-create' %}" class="btn btn-gradient btn-sm"><i class="bi bi-plus-lg"></i> Publicar oferta</a>
+            </div>
+            <div class="mt-3 small text-muted">
+              Total: {{ empresa_ofertas_stats.total }} · Abiertas: {{ empresa_ofertas_stats.abiertas }} · Pausadas: {{ empresa_ofertas_stats.pausadas }} · Cerradas: {{ empresa_ofertas_stats.cerradas }}
+            </div>
           {% else %}
-          <i class="bi bi-book-half fs-1 text-primary"></i>
-          <h5 class="mt-2 mb-2">Cursos</h5>
-          {% endif %}
-          {% if user.is_authenticated %}
-            <p class="mb-2 text-muted">Hola, {{ user.get_username }} 👋</p>
-            <p class="mb-2 text-muted">Mejoras sugeridas para tu perfil:</p>
-            <ul class="small text-muted mb-3 list-unstyled">
-              <li>• Completa tu perfil con experiencia, educación y habilidades.</li>
-              <li>• Refuerza competencias clave con cursos en áreas de interés.</li>
-              <li>• Añade certificaciones y proyectos destacados.</li>
-              <li>• Define objetivos de aprendizaje y plan semanal.</li>
-            </ul>
-            <a href="{% url 'curso-list' %}" class="btn btn-gradient btn-sm"><i class="bi bi-arrow-right"></i> Continuar aprendiendo</a>
-          {% else %}
-            <p class="mb-3 text-muted">Capacítate y mejora tu perfil.</p>
-            <a href="{% url 'login' %}" class="btn btn-gradient btn-sm"><i class="bi bi-person"></i> Inicia sesión para recomendaciones</a>
             {% if user.is_authenticated %}
-            <a href="{% url 'curso-list' %}" class="btn btn-link btn-sm text-decoration-none">Ir a tu perfil</a>
+              <i class="bi bi-person fs-1 text-primary"></i>
+              <h5 class="mt-2 mb-2">Tu perfil</h5>
+              <p class="mb-2 text-muted">Hola, {{ user.get_username }} 👋</p>
+              <p class="mb-2 text-muted">Mejoras sugeridas para tu perfil:</p>
+              <ul class="small text-muted mb-3 list-unstyled">
+                <li>• Completa tu perfil con experiencia, educación y habilidades.</li>
+                <li>• Refuerza competencias clave con cursos en áreas de interés.</li>
+                <li>• Añade certificaciones y proyectos destacados.</li>
+                <li>• Define objetivos de aprendizaje y plan semanal.</li>
+              </ul>
+              <a href="{% url 'curso-list' %}" class="btn btn-gradient btn-sm"><i class="bi bi-arrow-right"></i> Continuar aprendiendo</a>
             {% else %}
-            <a href="{% url 'curso-list' %}" class="btn btn-link btn-sm text-decoration-none">Ver cursos</a>
+              <i class="bi bi-book-half fs-1 text-primary"></i>
+              <h5 class="mt-2 mb-2">Cursos</h5>
+              <p class="mb-3 text-muted">Capacítate y mejora tu perfil.</p>
+              <a href="{% url 'login' %}" class="btn btn-gradient btn-sm"><i class="bi bi-person"></i> Inicia sesión para recomendaciones</a>
+              <a href="{% url 'curso-list' %}" class="btn btn-link btn-sm text-decoration-none">Ver cursos</a>
             {% endif %}
           {% endif %}
         </div>
@@ -79,19 +84,31 @@
       <div class="card card-hover h-100 border-0 shadow-sm">
         <div class="rounded-top" style="height:4px;background: linear-gradient(135deg,var(--brand-start),var(--brand-end));"></div>
         <div class="card-body">
-          <i class="bi bi-building fs-1 text-primary"></i>
-          <h5 class="mt-2 mb-2">Empresas</h5>
-          <p class="mb-2 text-muted">Conoce empresas asociadas y oportunidades alineadas a tus intereses.</p>
-          <div class="mb-3">
-            <div class="small fw-semibold mb-1">Sugerencias para explorar empresas:</div>
-            <ul class="list-unstyled small text-muted mb-0">
-              <li>• Busca por nombre o descripción para filtrar resultados.</li>
-              <li>• Revisa cultura, beneficios y tecnologías de cada organización.</li>
-              <li>• Observa roles clave y ofertas relacionadas para decidir dónde postular.</li>
-              <li>• Agrega tu empresa para atraer talento con una ficha clara.</li>
+          {% if es_empresa %}
+            <i class="bi bi-card-checklist fs-1 text-primary"></i>
+            <h5 class="mt-2 mb-2">Mis Ofertas</h5>
+            <p class="mb-2 text-muted">Resumen rápido de tus publicaciones.</p>
+            <ul class="small text-muted mb-3 list-unstyled">
+              <li>• Abiertas: {{ empresa_ofertas_stats.abiertas }}</li>
+              <li>• Pausadas: {{ empresa_ofertas_stats.pausadas }}</li>
+              <li>• Cerradas: {{ empresa_ofertas_stats.cerradas }}</li>
             </ul>
-          </div>
-          <a href="{% url 'empresa-list' %}" class="btn btn-gradient btn-sm"><i class="bi bi-arrow-right"></i> Ver empresas</a>
+            <a href="{% url 'ofertaempleo-list' %}?empresa_id={{ empresa_obj.pk }}" class="btn btn-gradient btn-sm"><i class="bi bi-list"></i> Ver mis ofertas</a>
+          {% else %}
+            <i class="bi bi-building fs-1 text-primary"></i>
+            <h5 class="mt-2 mb-2">Empresas</h5>
+            <p class="mb-2 text-muted">Conoce empresas asociadas y oportunidades alineadas a tus intereses.</p>
+            <div class="mb-3">
+              <div class="small fw-semibold mb-1">Sugerencias para explorar empresas:</div>
+              <ul class="list-unstyled small text-muted mb-0">
+                <li>• Busca por nombre o descripción para filtrar resultados.</li>
+                <li>• Revisa cultura, beneficios y tecnologías de cada organización.</li>
+                <li>• Observa roles clave y ofertas relacionadas para decidir dónde postular.</li>
+                <li>• Agrega tu empresa para atraer talento con una ficha clara.</li>
+              </ul>
+            </div>
+            <a href="{% url 'empresa-list' %}" class="btn btn-gradient btn-sm"><i class="bi bi-arrow-right"></i> Ver empresas</a>
+          {% endif %}
         </div>
       </div>
     </div>
@@ -99,10 +116,29 @@
       <div class="card card-hover h-100 border-0 shadow-sm">
         <div class="rounded-top" style="height:4px;background: linear-gradient(135deg,var(--brand-start),var(--brand-end));"></div>
         <div class="card-body">
-          <i class="bi bi-briefcase-fill fs-1 text-primary"></i>
-          <h5 class="mt-2 mb-2">Empleo</h5>
-          <p class="mb-3 text-muted">Postula a ofertas reales.</p>
-          <a href="{% url 'ofertaempleo-dashboard' %}" class="btn btn-gradient btn-sm"><i class="bi bi-briefcase-fill"></i> Ver dashboard</a>
+          {% if es_empresa %}
+            <i class="bi bi-graph-up fs-1 text-primary"></i>
+            <h5 class="mt-2 mb-2">Analítica</h5>
+            <p class="mb-2 text-muted">Mapa y estadísticas para revisar tus publicaciones.</p>
+            <div class="d-flex gap-2">
+              <a href="{% url 'ofertaempleo-dashboard' %}" class="btn btn-gradient btn-sm"><i class="bi bi-bar-chart"></i> Ver dashboard</a>
+              <a href="{% url 'ofertaempleo-mapa' %}" class="btn btn-outline-primary btn-sm"><i class="bi bi-geo-alt"></i> Ver mapa</a>
+            </div>
+          {% else %}
+            <i class="bi bi-briefcase-fill fs-1 text-primary"></i>
+            <h5 class="mt-2 mb-2">Empleo</h5>
+            <p class="mb-2 text-muted">Explora y postula a oportunidades alineadas a tu perfil.</p>
+            <div class="mb-3">
+              <div class="small fw-semibold mb-1">Sugerencias para aprovechar Empleo:</div>
+              <ul class="list-unstyled small text-muted mb-0">
+                <li>• Filtra por región, tipo de contrato y estado.</li>
+                <li>• Usa el mapa para visualizar ofertas cercanas.</li>
+                <li>• Revisa el dashboard para estadísticas y tendencias.</li>
+                <li>• Publica y administra ofertas si eres empresa.</li>
+              </ul>
+            </div>
+            <a href="{% url 'ofertaempleo-dashboard' %}" class="btn btn-gradient btn-sm"><i class="bi bi-briefcase-fill"></i> Ver dashboard</a>
+          {% endif %}
         </div>
       </div>
     </div>
@@ -178,10 +214,10 @@
       <div class="col-md-4">
         <div class="card h-100 border-0 shadow-sm">
           <div class="card-body">
-            <i class="bi bi-briefcase-fill fs-1 text-primary"></i>
-            <h6 class="mt-2 mb-1">Empleo</h6>
-            <p class="small text-muted mb-3">Postula a ofertas reales.</p>
-            <a href="{% url 'ofertaempleo-dashboard' %}" class="btn btn-outline-primary btn-sm"><i class="bi bi-briefcase-fill"></i> Ver dashboard</a>
+          <i class="bi bi-briefcase-fill fs-1 text-primary"></i>
+          <h6 class="mt-2 mb-1">Empleo</h6>
+          <a href="{% url 'ofertaempleo-list' %}" class="btn btn-outline-primary btn-sm"><i class="bi bi-briefcase-fill"></i> Ver empleos</a>
+          <span class="text-muted small ms-2">¿Quieres personalizar tu perfil y publicar ofertas? <a href="{% url 'login' %}" class="text-decoration-none">Ingresa</a></span>
           </div>
         </div>
       </div>

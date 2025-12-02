@@ -1,0 +1,83 @@
+{% extends 'Base.html' %}
+
+{% block title %}{% if object %}Editar Empresa{% else %}Crear Nueva Empresa{% endif %} | Impulsa Chile{% endblock %}
+{% block content %}
+<style>
+  .page-header { background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%); color: #fff; padding: 1rem 1.25rem; border-radius: 0.75rem; margin-bottom: 1rem; }
+  .btn-gradient { background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%); color: #fff; border: none; }
+  .btn-gradient:hover { filter: brightness(1.05); }
+  .form-text { color: #6c757d; }
+  .card { border-radius: 0.75rem; }
+</style>
+
+<div class="page-header d-flex align-items-center justify-content-between">
+  <div>
+    <h1 class="h4 mb-1">{% if object %}Editar Empresa: {{ object.razon_social }}{% else %}Registrar Nueva Empresa{% endif %}</h1>
+    <div class="small">Completa los datos para que tu empresa aparezca en el módulo.</div>
+  </div>
+  <a href="{% if object %}{% url 'empresa-detail' object.pk %}{% else %}{% url 'empresa-list' %}{% endif %}" class="btn btn-light btn-sm">Volver</a>
+</div>
+
+  <div class="card">
+    <div class="card-body">
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+      <div class="mb-3">
+        <label for="id_industria" class="form-label">Industria</label>
+        {{ form.industria }}
+        <div class="form-text">Selecciona el rubro principal de tu empresa.</div>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label for="id_rut" class="form-label">RUT</label>
+          {{ form.rut }}
+          <div class="form-text">Formato ejemplo: 76.123.456-7</div>
+        </div>
+        <div class="col-md-6">
+          <label for="id_razon_social" class="form-label">Razón Social</label>
+          {{ form.razon_social }}
+        </div>
+      </div>
+
+      <div class="mt-3">
+        <label for="id_descripcion" class="form-label">Descripción</label>
+        {{ form.descripcion }}
+        <div class="form-text">Describe la propuesta de valor, cultura y foco de la empresa.</div>
+      </div>
+
+      <div class="row g-3 mt-2">
+        <div class="col-md-6">
+          <label for="id_ubicacion_texto" class="form-label">Ubicación</label>
+          {{ form.ubicacion_texto }}
+          <div class="form-text">Ej: Santiago, RM.</div>
+        </div>
+        <div class="col-md-6">
+          <label for="id_tamano_rango" class="form-label">Tamaño</label>
+          {{ form.tamano_rango }}
+          <div class="form-text">Ej: 51–200 personas.</div>
+        </div>
+      </div>
+
+      <div class="mt-3">
+        <label for="id_por_que_elegirla" class="form-label">Por qué elegirla</label>
+        {{ form.por_que_elegirla }}
+        <div class="form-text">Ingresa una razón por línea (máximo 5–7 líneas).</div>
+      </div>
+
+      <div class="mt-3">
+        <label for="id_roles_clave" class="form-label">Roles clave</label>
+        {{ form.roles_clave }}
+        <div class="form-text">Separados por coma, ej: Full-Stack Developer, Data Analyst, Customer Success.</div>
+      </div>
+
+      <div class="mt-4 d-flex gap-2">
+        <button type="submit" class="btn btn-gradient">Guardar</button>
+        <a href="{% if object %}{% url 'empresa-detail' object.pk %}{% else %}{% url 'empresa-list' %}{% endif %}" class="btn btn-outline-secondary">Cancelar</a>
+      </div>
+      </form>
+  </div>
+</div>
+
+{% endblock %}

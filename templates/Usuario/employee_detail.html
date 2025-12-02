@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle de Empleado</title>
+    <style>
+        body { font-family: sans-serif; margin: 2em; background-color: #f4f4f4; }
+        .container { background: white; padding: 2em; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h1 { color: #333; }
+        ul { list-style-type: none; padding: 0; }
+        li { margin-bottom: 10px; font-size: 1.1em; }
+        strong { color: #555; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Detalle del Empleado</h1>
+        <ul>
+            <li><strong>ID:</strong> {{ employee.id }}</li>
+            <li><strong>Nombre:</strong> {{ employee.name }}</li>
+            <li><strong>Email:</strong> {{ employee.email }}</li>
+            <li><strong>Salario:</strong> ${{ employee.salary }}</li>
+        </ul>
+    </div>
+</body>
+</html>
