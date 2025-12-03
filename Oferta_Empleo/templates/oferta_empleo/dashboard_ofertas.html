@@ -6,57 +6,8 @@
 <div class="container mt-4">
     <h1 class="mb-4">Dashboard de Ofertas de Empleo</h1>
 
-    <!-- Buscador Jooble -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="card-title">Buscar Ofertas Externas (Jooble)</h5>
-            <form method="get" class="row g-3">
-                <div class="col-md-5">
-                    <input type="text" name="q" class="form-control" placeholder="Cargo, palabras clave..." value="{{ busqueda_q }}">
-                </div>
-                <div class="col-md-5">
-                    <input type="text" name="ub" class="form-control" placeholder="Ubicación (ej. Santiago)" value="{{ busqueda_ub }}">
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100">Buscar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    {% if busqueda_q %}
-    <!-- Resultados Jooble -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-info text-white">
-                    Resultados de Jooble para "{{ busqueda_q }}"
-                </div>
-                <ul class="list-group list-group-flush">
-                    {% for oferta in ofertas_adzuna %}
-                    <li class="list-group-item">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h6 class="mb-1"><a href="{{ oferta.redirect_url }}" target="_blank">{{ oferta.title }}</a></h6>
-                                <p class="mb-1 text-muted">{{ oferta.company.display_name }} - {{ oferta.location.display_name }}</p>
-                                <small>{{ oferta.description|striptags|truncatewords:20 }}</small>
-                            </div>
-                            <span class="badge bg-light text-dark">{{ oferta.created|slice:":10" }}</span>
-                        </div>
-                    </li>
-                    {% empty %}
-                    <li class="list-group-item">No se encontraron resultados en Jooble.</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Incluir Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Fila de Estadísticas Clave -->
     <div class="row mb-4">
         <div class="col-md-3">
             <div class="card text-white bg-primary mb-3">
@@ -92,7 +43,6 @@
         </div>
     </div>
 
-    <!-- Fila de Gráficos -->
     <div class="row mb-4">
         <div class="col-md-8">
             <div class="card">
@@ -112,7 +62,6 @@
         </div>
     </div>
 
-    <!-- Fila de Actividad Reciente -->
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -139,11 +88,9 @@
 </div>
 
 <script>
-    // Datos pasados desde Django
     const ofertasPorRegionData = JSON.parse('{{ ofertas_por_region_json|escapejs }}');
     const ofertasPorContratoData = JSON.parse('{{ ofertas_por_contrato_json|escapejs }}');
 
-    // Gráfico de Ofertas por Región (Barras)
     const regionLabels = ofertasPorRegionData.map(item => item.region__nombre_region);
     const regionTotals = ofertasPorRegionData.map(item => item.total);
 
@@ -161,19 +108,12 @@
             }]
         },
         options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            },
+            scales: { y: { beginAtZero: true } },
             responsive: true,
-            plugins: {
-                legend: { display: false }
-            }
+            plugins: { legend: { display: false } }
         }
     });
 
-    // Gráfico de Ofertas por Tipo de Contrato (Torta/Pie)
     const contratoLabels = ofertasPorContratoData.map(item => item.tipo_contrato__nombre_contrato || 'No especificado');
     const contratoTotals = ofertasPorContratoData.map(item => item.total);
 
@@ -188,9 +128,7 @@
                 backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'],
             }]
         },
-        options: {
-            responsive: true,
-        }
+        options: { responsive: true }
     });
 </script>
 {% endblock %}

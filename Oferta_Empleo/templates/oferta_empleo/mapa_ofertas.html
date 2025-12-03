@@ -1,43 +1,60 @@
-{% extends "base.html" %} {# Asegúrate de que tu plantilla base exista y tenga un bloque de contenido #}
+{% extends 'base.html' %}
 
 {% block title %}Mapa de Ofertas de Empleo{% endblock %}
 
 {% block content %}
-<h2>Mapa de Ofertas de Empleo</h2>
+<div class="container mt-4">
+    <h1 class="mb-4">Mapa de Ofertas de Empleo</h1>
 
-<!-- Incluir los archivos de Mapbox -->
-<script src='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js'></script>
-<link href='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css' rel='stylesheet' />
+    <!-- Incluir Mapbox GL JS y CSS -->
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css' rel='stylesheet' />
 
-<!-- Contenedor del mapa -->
-<div id='map' style='width: 100%; height: 600px;'></div>
+    <div id='map' style='width: 100%; height: 600px;'></div>
 
-<script>
-  // Token de acceso pasado desde la vista
-  mapboxgl.accessToken = '{{ mapbox_access_token }}';
+    <script>
+        // Pasamos las variables de Django a JavaScript
+        const mapboxAccessToken = "{{ mapbox_access_token }}";
+        // Parseamos el JSON de ofertas que viene serializado desde la vista
+        const ofertasData = JSON.parse('{{ ofertas_json|escapejs }}');
 
-  // Inicializar el mapa
-  const map = new mapboxgl.Map({
-    container: 'map',
-    style: 'mapbox://styles/mapbox/streets-v11',
-    center: [-70.6693, -33.4489], // Coordenadas de Santiago, Chile
-    zoom: 9
-  });
+        mapboxgl.accessToken = mapboxAccessToken;
+        const map = new mapboxgl.Map({
+            container: 'map', // ID del contenedor del mapa
+            style: 'mapbox://styles/mapbox/streets-v11', // Estilo del mapa
+            center: [-71.5518, -35.6751], // Centro inicial del mapa [lng, lat] (Chile)
+            zoom: 4 // Zoom inicial
+        });
 
-  // Convertir los datos de Django a un objeto JavaScript
-  const ofertas = JSON.parse('{{ ofertas_json|escapejs }}');
+        // Añadir controles de navegación (zoom, rotación)
+        map.addControl(new mapboxgl.NavigationControl());
 
-  // Iterar sobre las ofertas y añadir marcadores
-  ofertas.forEach(oferta => {
-    // Crear un popup con información de la oferta
-    const popup = new mapboxgl.Popup({ offset: 25 })
-      .setHTML(`<h3><a href="/ofertas/${oferta.pk}/">${oferta.fields.titulo}</a></h3><p>${oferta.fields.direccion_texto}</p>`);
+        // Iterar sobre cada oferta y añadir un marcador al mapa
+        ofertasData.forEach(oferta => {
+            const { pk, fields } = oferta;
+            const { titulo, latitud, longitud, direccion_texto } = fields;
 
-    // Crear el marcador y añadirlo al mapa
-    new mapboxgl.Marker()
-      .setLngLat([oferta.fields.longitud, oferta.fields.latitud])
-      .setPopup(popup) // Asignar el popup al marcador
-      .addTo(map);
-  });
-</script>
+            if (latitud && longitud) {
+                // Crear el contenido del popup
+                const popupContent = `
+                    <div>
+                        <h5>${titulo}</h5>
+                        <p>${direccion_texto || 'Dirección no especificada'}</p>
+                        <a href="/ofertas/${pk}/" class="btn btn-sm btn-primary">Ver detalle</a>
+                    </div>
+                `;
+
+                // Crear un popup
+                const popup = new mapboxgl.Popup({ offset: 25 })
+                    .setHTML(popupContent);
+
+                // Crear un marcador para la oferta y añadirlo al mapa
+                new mapboxgl.Marker()
+                    .setLngLat([longitud, latitud])
+                    .setPopup(popup) // Asignar el popup al marcador
+                    .addTo(map);
+            }
+        });
+    </script>
+</div>
 {% endblock %}
