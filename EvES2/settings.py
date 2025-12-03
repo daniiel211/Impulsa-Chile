@@ -129,12 +129,32 @@ WSGI_APPLICATION = 'EvES2.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL', 'sqlite:///db.sqlite3'),
-        conn_max_age=600
-    )
-}
+DATABASES = {}
+
+# Intentar configurar la base de datos
+database_url = os.environ.get('DATABASE_URL')
+
+# Fix común para URLs de Railway que a veces vienen sin el protocolo correcto
+if database_url and not database_url.startswith('postgres://') and not database_url.startswith('postgresql://') and not database_url.startswith('sqlite://'):
+    # Si parece una URL de host pero sin protocolo (ej: trolley.proxy.rlwy.net...)
+    if 'rlwy.net' in database_url or 'railway' in database_url:
+        database_url = f"postgresql://{database_url}"
+
+try:
+    if database_url:
+        DATABASES['default'] = dj_database_url.parse(database_url, conn_max_age=600)
+    else:
+        # Si no hay URL, usar SQLite por defecto
+        DATABASES['default'] = {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+except Exception as e:
+    print(f"Error configurando base de datos desde URL: {e}. Usando SQLite.")
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 
 
 
