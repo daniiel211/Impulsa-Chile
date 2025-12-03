@@ -11,7 +11,8 @@ class OfertaEmpleoForm(forms.ModelForm):
         model = OfertaEmpleo
         fields = [
             'titulo', 'descripcion', 'region', 'tipo_contrato', 
-            'estado', 'direccion_texto', 'latitud', 'longitud'
+            'estado', 'direccion_texto', 'latitud', 'longitud',
+            'id_externo_adzuna', 'url_postulacion_externa', 'es_externa'
         ]
         widgets = {
             'descripcion': forms.Textarea(attrs={'rows': 5}),

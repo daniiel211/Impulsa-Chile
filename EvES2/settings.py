@@ -25,7 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # --- Google API Client ID ---
 # Esta es la variable que usaremos para la autenticación con Google.
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
-
+# --- Adzuna API ---
+ADZUNA_APP_ID = os.environ.get('ADZUNA_APP_ID')
+ADZUNA_APP_KEY = os.environ.get('ADZUNA_APP_KEY')
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -142,7 +144,12 @@ if database_url and not database_url.startswith('postgres://') and not database_
 
 try:
     if database_url:
-        DATABASES['default'] = dj_database_url.parse(database_url, conn_max_age=600)
+        db_config = dj_database_url.parse(database_url, conn_max_age=600)
+        # Verificar que la configuración tenga al menos un nombre de base de datos
+        if not db_config.get('NAME'):
+             print(f"Advertencia: Configuración de base de datos incompleta (falta NAME) para URL: {database_url}. Usando SQLite.")
+             raise ValueError("Database NAME is missing")
+        DATABASES['default'] = db_config
     else:
         # Si no hay URL, usar SQLite por defecto
         DATABASES['default'] = {

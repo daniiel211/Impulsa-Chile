@@ -36,6 +36,15 @@
                         </div>
                         <div class="mb-3">{{ form.estado.label_tag }} {{ form.estado }}</div>
                         <div class="mb-3">{{ form.direccion_texto.label_tag }} {{ form.direccion_texto }}</div>
+                        
+                        <div class="mb-3">{{ form.url_postulacion_externa.label_tag }} {{ form.url_postulacion_externa }}</div>
+                        <div class="mb-3 form-check">
+                            {{ form.es_externa }}
+                            <label class="form-check-label" for="{{ form.es_externa.id_for_label }}">
+                                {{ form.es_externa.label }}
+                            </label>
+                        </div>
+                        <div class="mb-3">{{ form.id_externo_adzuna.label_tag }} {{ form.id_externo_adzuna }}</div>
 
                         <!-- Campos ocultos para latitud y longitud -->
                         {{ form.latitud }}

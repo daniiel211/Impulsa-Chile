@@ -43,7 +43,9 @@ class OfertaEmpleo(models.Model):
         verbose_name="Estado"
     )
     fecha_publicacion = models.DateTimeField("Fecha de Publicación", auto_now_add=True)
-
+    id_externo_adzuna = models.CharField(max_length=100, unique=True, null=True, blank=True, help_text="ID único de la oferta en Adzuna")
+    url_postulacion_externa = models.URLField(max_length=500, null=True, blank=True, help_text="Link para postular si es externa")
+    es_externa = models.BooleanField(default=False)
     def __str__(self):
         return f"{self.titulo} - {self.empresa.razon_social}"
 

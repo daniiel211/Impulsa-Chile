@@ -102,7 +102,7 @@ class OfertaEmpleoDetailView(DetailView):
 
 class OfertaEmpleoCreateView(LoginRequiredMixin, CreateView):
     model = OfertaEmpleo
-    fields = ['region', 'tipo_contrato', 'titulo', 'descripcion', 'estado', 'direccion_texto', 'latitud', 'longitud']
+    fields = ['region', 'tipo_contrato', 'titulo', 'descripcion', 'estado', 'direccion_texto', 'latitud', 'longitud', 'id_externo_adzuna', 'url_postulacion_externa', 'es_externa']
     template_name = 'oferta_empleo/ofertaempleo_form.html'
     success_url = reverse_lazy('ofertaempleo-list')
 
@@ -229,7 +229,7 @@ class OfertaEmpleoCreateView(LoginRequiredMixin, CreateView):
 
 class OfertaEmpleoUpdateView(LoginRequiredMixin, UpdateView):
     model = OfertaEmpleo
-    fields = ['empresa', 'region', 'tipo_contrato', 'titulo', 'descripcion', 'estado', 'direccion_texto', 'latitud', 'longitud']
+    fields = ['empresa', 'region', 'tipo_contrato', 'titulo', 'descripcion', 'estado', 'direccion_texto', 'latitud', 'longitud', 'id_externo_adzuna', 'url_postulacion_externa', 'es_externa']
     template_name = 'oferta_empleo/ofertaempleo_form.html'
     success_url = reverse_lazy('ofertaempleo-list')
 
@@ -326,3 +326,16 @@ def dashboard_ofertas_view(request):
     }
 
     return render(request, 'oferta_empleo/dashboard_ofertas.html', context)
+
+def lista_ofertas_externas(request):
+    query = request.GET.get('q', 'python') # Busca 'python' por defecto
+    ubicacion = request.GET.get('ub', 'santiago')
+    
+    # Llamamos a la API
+    ofertas_adzuna = buscar_ofertas_adzuna(query=query, location=ubicacion)
+    
+    context = {
+        'ofertas': ofertas_adzuna,
+        'busqueda': query
+    }
+    return render(request, 'Oferta_Empleo/ofertas_externas.html', context)

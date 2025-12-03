@@ -77,6 +77,11 @@
                         {% endif %}
                         
                         <div class="d-grid gap-2 mt-4">
+                            {% if object.url_postulacion_externa %}
+                                <a href="{{ object.url_postulacion_externa }}" target="_blank" class="btn btn-success">
+                                    <i class="bi bi-box-arrow-up-right me-2"></i>Postular en sitio externo
+                                </a>
+                            {% endif %}
                             {% if user.is_authenticated and user == object.empresa.usuario %}
                                 <a href="{% url 'ofertaempleo-update' object.pk %}" class="btn btn-primary">
                                     <i class="bi bi-pencil me-2"></i>Editar Oferta
