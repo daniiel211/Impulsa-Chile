@@ -14,6 +14,8 @@ from django.core.serializers import serialize
 import json
 from django.shortcuts import render
 from django.db.models import Count
+from .services import sincronizar_ofertas_adzuna
+from django.db.models import Q
 
 INDUSTRY_TEMPLATES = {
     'Tecnología': [
@@ -79,17 +81,46 @@ class OfertaEmpleoListView(ListView):
     model = OfertaEmpleo
     template_name = 'oferta_empleo/ofertaempleo_list.html'
     context_object_name = 'ofertas'
-
     def get_queryset(self):
         qs = super().get_queryset()
+        
+        # Sincronización opcional al listar si hay búsqueda
+        search_query = self.request.GET.get('q')
+        if search_query:
+             sincronizar_ofertas_adzuna(query=search_query)
+             qs = qs.filter(Q(titulo__icontains=search_query) | Q(descripcion__icontains=search_query))
+
         empresa_id = self.request.GET.get('empresa_id')
         if empresa_id:
             qs = qs.filter(empresa__pk=empresa_id)
-        return qs
+        return qs.order_by('-fecha_publicacion')
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         return ctx
+
+def buscar_empleos(request):
+    query = request.GET.get('q', '')
+    ubicacion = request.GET.get('ub', '')
+
+    # 1. Si el usuario buscó algo, intentamos traer novedades de la API y guardarlas
+    if query:
+        sincronizar_ofertas_adzuna(query=query, location=ubicacion)
+
+    # 2. AHORA consultamos SOLO nuestra base de datos
+    ofertas = OfertaEmpleo.objects.all().order_by('-fecha_publicacion')
+
+    if query:
+        ofertas = ofertas.filter(
+            Q(titulo__icontains=query) | 
+            Q(descripcion__icontains=query)
+        )
+
+    context = {
+        'ofertas': ofertas,
+        'busqueda': query
+    }
+    return render(request, 'oferta_empleo/ofertaempleo_list.html', context)
 
 class OfertaEmpleoDetailView(DetailView):
     model = OfertaEmpleo
@@ -290,6 +321,8 @@ def mapa_ofertas_view(request):
     }
     return render(request, 'oferta_empleo/mapa_ofertas.html', context)
 
+from .adzuna_service import buscar_ofertas_adzuna
+
 def dashboard_ofertas_view(request):
     # 1. Estadísticas clave
     total_ofertas = OfertaEmpleo.objects.count()
@@ -315,6 +348,14 @@ def dashboard_ofertas_view(request):
     # 3. Actividad reciente
     ofertas_recientes = OfertaEmpleo.objects.order_by('-fecha_publicacion')[:5]
 
+    # 4. Buscador Adzuna
+    query = request.GET.get('q', '')
+    location = request.GET.get('ub', '')
+    ofertas_adzuna = []
+    
+    if query:
+        ofertas_adzuna = buscar_ofertas_adzuna(query=query, location=location)
+
     context = {
         'total_ofertas': total_ofertas,
         'ofertas_abiertas': ofertas_abiertas,
@@ -323,6 +364,9 @@ def dashboard_ofertas_view(request):
         'ofertas_por_region_json': json.dumps(list(ofertas_por_region)),
         'ofertas_por_contrato_json': json.dumps(list(ofertas_por_contrato)),
         'ofertas_recientes': ofertas_recientes,
+        'ofertas_adzuna': ofertas_adzuna,
+        'busqueda_q': query,
+        'busqueda_ub': location,
     }
 
     return render(request, 'oferta_empleo/dashboard_ofertas.html', context)
@@ -339,3 +383,28 @@ def lista_ofertas_externas(request):
         'busqueda': query
     }
     return render(request, 'Oferta_Empleo/ofertas_externas.html', context)
+
+def buscar_empleos(request):
+    query = request.GET.get('q', '')
+    ubicacion = request.GET.get('ub', '')
+
+    # 1. Si el usuario buscó algo, intentamos traer novedades de la API y guardarlas
+    if query:
+        # Esto puede tardar un poco, idealmente se hace con Celery, 
+        # pero para empezar está bien hacerlo directo aquí.
+        sincronizar_ofertas_adzuna(query=query, location=ubicacion)
+
+    # 2. AHORA consultamos SOLO nuestra base de datos (que ya tiene las ofertas nuevas mezcladas)
+    ofertas = OfertaEmpleo.objects.all().order_by('-fecha_publicacion')
+
+    if query:
+        ofertas = ofertas.filter(
+            Q(titulo__icontains=query) | 
+            Q(descripcion__icontains=query)
+        )
+
+    context = {
+        'ofertas': ofertas,
+        'busqueda': query
+    }
+    return render(request, 'oferta_empleo/ofertaempleo_list.html', context)

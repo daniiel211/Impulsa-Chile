@@ -18,13 +18,21 @@ def buscar_ofertas_adzuna(query="desarrollador", location="chile", page=1):
     }
 
     try:
+        print(f"DEBUG: Consultando Adzuna API. Endpoint: {endpoint}")
+        print(f"DEBUG: Params: app_id={params['app_id']}, app_key={params['app_key']}, what={params['what']}, where={params['where']}")
+        
         response = requests.get(endpoint, params=params)
+        print(f"DEBUG: Status Code: {response.status_code}")
+        
         response.raise_for_status() # Lanza error si la petición falla (404, 500)
         data = response.json()
         
-        # Retornamos solo la lista de resultados
-        return data.get('results', [])
+        results = data.get('results', [])
+        print(f"DEBUG: Resultados encontrados: {len(results)}")
+        return results
         
     except requests.exceptions.RequestException as e:
         print(f"Error conectando con Adzuna: {e}")
+        if 'response' in locals():
+             print(f"DEBUG: Response content: {response.text}")
         return []

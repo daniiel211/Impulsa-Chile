@@ -6,6 +6,53 @@
 <div class="container mt-4">
     <h1 class="mb-4">Dashboard de Ofertas de Empleo</h1>
 
+    <!-- Buscador Adzuna -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Buscar Ofertas Externas (Adzuna)</h5>
+            <form method="get" class="row g-3">
+                <div class="col-md-5">
+                    <input type="text" name="q" class="form-control" placeholder="Cargo, palabras clave..." value="{{ busqueda_q }}">
+                </div>
+                <div class="col-md-5">
+                    <input type="text" name="ub" class="form-control" placeholder="Ubicación (ej. Santiago)" value="{{ busqueda_ub }}">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Buscar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if busqueda_q %}
+    <!-- Resultados Adzuna -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    Resultados de Adzuna para "{{ busqueda_q }}"
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for oferta in ofertas_adzuna %}
+                    <li class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1"><a href="{{ oferta.redirect_url }}" target="_blank">{{ oferta.title }}</a></h6>
+                                <p class="mb-1 text-muted">{{ oferta.company.display_name }} - {{ oferta.location.display_name }}</p>
+                                <small>{{ oferta.description|truncatewords:20 }}</small>
+                            </div>
+                            <span class="badge bg-light text-dark">{{ oferta.created|slice:":10" }}</span>
+                        </div>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item">No se encontraron resultados en Adzuna.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <div class="row mb-4">
