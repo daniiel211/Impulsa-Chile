@@ -3,14 +3,19 @@
 {% block title %}Mapa de Ofertas de Empleo{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1 class="mb-4">Mapa de Ofertas de Empleo</h1>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2 fw-bold mb-0">Mapa de Ofertas de Empleo</h1>
+        <a href="{% url 'ofertaempleo-list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-list-ul me-2"></i>Ver Listado
+        </a>
+    </div>
 
     <!-- Incluir Mapbox GL JS y CSS -->
     <script src='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js'></script>
     <link href='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css' rel='stylesheet' />
 
-    <div id='map' style='width: 100%; height: 600px;'></div>
+    <div id='map' class="rounded shadow-sm" style='width: 100%; height: 600px;'></div>
 
     <script>
         // Pasamos las variables de Django a JavaScript

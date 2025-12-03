@@ -1,85 +1,88 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% block title %}Ofertas de Empleo | Impulsa Chile{% endblock %}
+
 {% block content %}
-  <div class="row g-4">
-    <div class="col-12">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
-            <h1 class="h4 mb-0">Ofertas de Empleo</h1>
-            {% if user.is_authenticated %}
-              <a href="{% url 'ofertaempleo-create' %}" class="btn btn-outline-primary">Publicar Nueva Oferta</a>
-            {% endif %}
-          </div>
-          {% if user.is_authenticated %}
-            <h2 class="h6 text-muted mb-3">Crear Nueva Oferta de Empleo</h2>
-            <form method="post" action="{% url 'ofertaempleo-create' %}" class="row g-3">
-              {% csrf_token %}
-              <div class="col-md-4">
-                <label for="empresa" class="form-label">Empresa (ID)</label>
-                <input type="number" id="empresa" name="empresa" class="form-control" required>
-              </div>
-              <div class="col-md-4">
-                <label for="region" class="form-label">Región (ID)</label>
-                <input type="number" id="region" name="region" class="form-control" required>
-              </div>
-              <div class="col-md-4">
-                <label for="tipo_contrato" class="form-label">Tipo de Contrato (ID, opcional)</label>
-                <input type="number" id="tipo_contrato" name="tipo_contrato" class="form-control">
-              </div>
-              <div class="col-md-6">
-                <label for="titulo" class="form-label">Título</label>
-                <input type="text" id="titulo" name="titulo" class="form-control" required>
-              </div>
-              <div class="col-md-6">
-                <label for="estado" class="form-label">Estado</label>
-                <select id="estado" name="estado" class="form-select" required>
-                  <option value="AB">Abierta</option>
-                  <option value="CE">Cerrada</option>
-                  <option value="PA">Pausada</option>
-                </select>
-              </div>
-              <div class="col-12">
-                <label for="descripcion" class="form-label">Descripción</label>
-                <textarea id="descripcion" name="descripcion" rows="3" class="form-control"></textarea>
-              </div>
-              <div class="col-12 d-flex gap-2">
-                <button type="submit" class="btn btn-gradient">Guardar</button>
-              </div>
-            </form>
-          {% else %}
-            <div class="mb-0">
-              <h2 class="h6 text-muted mb-3">¿Qué puedes hacer en el módulo de Empleo?</h2>
-              <ul class="list-unstyled small text-muted mb-3">
-                <li>• Explorar ofertas disponibles y sus detalles.</li>
-                <li>• Revisar el estado de cada oferta y su ubicación.</li>
-              </ul>
-              <div class="alert alert-light border mb-0">
-                ¿Quieres publicar o administrar ofertas?
-                <a class="btn btn-gradient btn-sm ms-2" href="{% url 'login' %}">Inicia sesión y descubre más</a>
-              </div>
-            </div>
-          {% endif %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 fw-bold mb-1">Ofertas de Empleo</h1>
+            <p class="text-muted mb-0">Explora las oportunidades laborales disponibles</p>
         </div>
-      </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'ofertaempleo-mapa' %}" class="btn btn-outline-primary">
+                <i class="bi bi-map me-2"></i>Ver Mapa
+            </a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'ofertaempleo-create' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-lg me-2"></i>Publicar Oferta
+                </a>
+            {% endif %}
+        </div>
     </div>
 
-    <div class="col-12">
-      <div class="row g-3">
+    {% if not user.is_authenticated %}
+    <div class="alert alert-info border-0 shadow-sm mb-4">
+        <div class="d-flex align-items-center">
+            <i class="bi bi-info-circle-fill fs-4 me-3 text-info"></i>
+            <div>
+                <h5 class="alert-heading h6 mb-1">¿Eres una empresa?</h5>
+                <p class="mb-0 small">Inicia sesión para publicar y gestionar tus ofertas de empleo de manera sencilla.</p>
+            </div>
+            <a href="{% url 'login' %}" class="btn btn-sm btn-light ms-auto fw-medium">Iniciar Sesión</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row g-4">
         {% for oferta in ofertas %}
         <div class="col-md-6 col-lg-4">
-          <div class="card h-100 card-hover">
-            <div class="card-body">
-              <a href="{% url 'ofertaempleo-detail' oferta.pk %}" class="text-decoration-none text-dark">
-                <div class="fw-semibold">{{ oferta.titulo }}</div>
-                <div class="text-muted small">{{ oferta.empresa.razon_social }}</div>
-                <div class="text-muted small">{{ oferta.region }} | {{ oferta.get_estado_display }}</div>
-              </a>
+            <div class="card h-100 shadow-sm card-hover border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge {% if oferta.estado == 'AB' %}bg-success{% elif oferta.estado == 'CE' %}bg-secondary{% else %}bg-warning{% endif %} bg-opacity-10 text-{% if oferta.estado == 'AB' %}success{% elif oferta.estado == 'CE' %}secondary{% else %}warning{% endif %}">
+                            {{ oferta.get_estado_display }}
+                        </span>
+                        <small class="text-muted">{{ oferta.fecha_publicacion|timesince }}</small>
+                    </div>
+                    
+                    <h3 class="h5 fw-bold mb-1">
+                        <a href="{% url 'ofertaempleo-detail' oferta.pk %}" class="text-decoration-none text-dark stretched-link">
+                            {{ oferta.titulo }}
+                        </a>
+                    </h3>
+                    <p class="text-muted small mb-3">{{ oferta.empresa.razon_social }}</p>
+                    
+                    <div class="d-flex flex-column gap-2 small text-muted">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-geo-alt me-2 text-primary"></i>
+                            {{ oferta.region.nombre_region }}
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-briefcase me-2 text-primary"></i>
+                            {{ oferta.tipo_contrato.nombre_contrato|default:"No especificado" }}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-white border-top-0 pt-0 pb-3">
+                    <hr class="my-2 text-muted opacity-25">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">Ver detalles</small>
+                        <i class="bi bi-arrow-right text-primary"></i>
+                    </div>
+                </div>
             </div>
-          </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <div class="mb-3">
+                <i class="bi bi-briefcase fs-1 text-muted opacity-50"></i>
+            </div>
+            <h3 class="h5 text-muted">No hay ofertas disponibles en este momento</h3>
+            <p class="small text-muted">Vuelve a revisar más tarde o publica una nueva oferta.</p>
         </div>
         {% endfor %}
-      </div>
     </div>
-  </div>
+</div>
 {% endblock %}

@@ -95,6 +95,11 @@ class OfertaEmpleoDetailView(DetailView):
     model = OfertaEmpleo
     template_name = 'oferta_empleo/ofertaempleo_detail.html'
 
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['mapbox_access_token'] = settings.MAPBOX_ACCESS_TOKEN
+        return ctx
+
 class OfertaEmpleoCreateView(LoginRequiredMixin, CreateView):
     model = OfertaEmpleo
     fields = ['region', 'tipo_contrato', 'titulo', 'descripcion', 'estado', 'direccion_texto', 'latitud', 'longitud']
