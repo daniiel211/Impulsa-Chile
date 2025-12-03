@@ -97,7 +97,7 @@ class OfertaEmpleoDetailView(DetailView):
 
 class OfertaEmpleoCreateView(LoginRequiredMixin, CreateView):
     model = OfertaEmpleo
-    fields = ['region', 'tipo_contrato', 'titulo', 'descripcion', 'estado']
+    fields = ['region', 'tipo_contrato', 'titulo', 'descripcion', 'estado', 'direccion_texto', 'latitud', 'longitud']
     template_name = 'oferta_empleo/ofertaempleo_form.html'
     success_url = reverse_lazy('ofertaempleo-list')
 
@@ -172,6 +172,7 @@ class OfertaEmpleoCreateView(LoginRequiredMixin, CreateView):
             pass
         ctx['industry_name'] = industry_name
         ctx['industry_examples'] = examples
+        ctx['mapbox_access_token'] = settings.MAPBOX_ACCESS_TOKEN
         return ctx
 
     def get_form(self, form_class=None):
@@ -189,6 +190,19 @@ class OfertaEmpleoCreateView(LoginRequiredMixin, CreateView):
             form.fields['titulo'].widget.attrs.update({'placeholder': 'Desarrollador/a Full-Stack (Python/Django)'})
         if 'descripcion' in form.fields:
             form.fields['descripcion'].widget.attrs.update({'placeholder': 'Responsabilidades: desarrollar features y mantener aplicaciones web.\nRequisitos: 2+ años de experiencia, Python/Django, front-end básico.\nOfrecemos: modalidad híbrida, seguro complementario, plan de capacitación.'})
+        
+        # Configurar widgets para campos de ubicación
+        from django.forms import HiddenInput
+        if 'latitud' in form.fields:
+            form.fields['latitud'].widget = HiddenInput()
+        if 'longitud' in form.fields:
+            form.fields['longitud'].widget = HiddenInput()
+        if 'direccion_texto' in form.fields:
+            form.fields['direccion_texto'].widget.attrs.update({
+                'class': 'form-control',
+                'placeholder': 'Ingresa la dirección o selecciona en el mapa'
+            })
+            
         return form
 
     def get_success_url(self):
@@ -210,13 +224,44 @@ class OfertaEmpleoCreateView(LoginRequiredMixin, CreateView):
 
 class OfertaEmpleoUpdateView(LoginRequiredMixin, UpdateView):
     model = OfertaEmpleo
-    fields = ['empresa', 'region', 'tipo_contrato', 'titulo', 'descripcion', 'estado']
+    fields = ['empresa', 'region', 'tipo_contrato', 'titulo', 'descripcion', 'estado', 'direccion_texto', 'latitud', 'longitud']
     template_name = 'oferta_empleo/ofertaempleo_form.html'
     success_url = reverse_lazy('ofertaempleo-list')
 
     def get_queryset(self):
         qs = super().get_queryset()
         return qs.filter(empresa__usuario=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['mapbox_access_token'] = settings.MAPBOX_ACCESS_TOKEN
+        return ctx
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        from django.forms import HiddenInput, TextInput, NumberInput, EmailInput, Textarea, Select
+        
+        # Aplicar estilos generales
+        for name, field in form.fields.items():
+            widget = field.widget
+            if isinstance(widget, (TextInput, NumberInput, EmailInput)):
+                widget.attrs.update({'class': 'form-control'})
+            elif isinstance(widget, Textarea):
+                widget.attrs.update({'class': 'form-control', 'rows': 6})
+            elif isinstance(widget, Select):
+                widget.attrs.update({'class': 'form-select'})
+
+        # Configurar widgets específicos
+        if 'latitud' in form.fields:
+            form.fields['latitud'].widget = HiddenInput()
+        if 'longitud' in form.fields:
+            form.fields['longitud'].widget = HiddenInput()
+        if 'direccion_texto' in form.fields:
+            form.fields['direccion_texto'].widget.attrs.update({
+                'class': 'form-control',
+                'placeholder': 'Ingresa la dirección o selecciona en el mapa'
+            })
+        return form
 
 class OfertaEmpleoDeleteView(LoginRequiredMixin, DeleteView):
     model = OfertaEmpleo

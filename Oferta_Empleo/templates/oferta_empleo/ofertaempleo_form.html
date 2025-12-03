@@ -51,11 +51,67 @@
                         <button type="submit" class="btn btn-primary">Guardar Oferta</button>
                         <a href="{% url 'empresa-dashboard' %}" class="btn btn-secondary">Cancelar</a>
                     </form>
+{% extends 'base.html' %}
+
+{% block title %}{% if object %}Editar Oferta de Empleo{% else %}Crear Nueva Oferta de Empleo{% endif %}{% endblock %}
+
+{% block extra_head %}
+<!-- Mapbox GL JS -->
+<script src='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css' rel='stylesheet' />
+<style>
+    #map {
+        height: 400px;
+        width: 100%;
+        border-radius: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2>{% if object %}Editar Oferta de Empleo{% else %}Crear Nueva Oferta de Empleo{% endif %}</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Campos visibles del formulario -->
+                        <div class="mb-3">{{ form.titulo.label_tag }} {{ form.titulo }}</div>
+                        <div class="mb-3">{{ form.descripcion.label_tag }} {{ form.descripcion }}</div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">{{ form.region.label_tag }} {{ form.region }}</div>
+                            <div class="col-md-6 mb-3">{{ form.tipo_contrato.label_tag }} {{ form.tipo_contrato }}</div>
+                        </div>
+                        <div class="mb-3">{{ form.estado.label_tag }} {{ form.estado }}</div>
+                        <div class="mb-3">{{ form.direccion_texto.label_tag }} {{ form.direccion_texto }}</div>
+
+                        <!-- Campos ocultos para latitud y longitud -->
+                        {{ form.latitud }}
+                        {{ form.longitud }}
+
+                        <!-- Mapa interactivo -->
+                        <div class="mb-3">
+                            <label for="map" class="form-label">Selecciona la ubicación en el mapa</label>
+                            <div id="map"></div>
+                            <small class="form-text text-muted">Haz clic en el mapa para establecer la ubicación exacta de la oferta.</small>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Guardar Oferta</button>
+                        <a href="{% url 'empresa-dashboard' %}" class="btn btn-secondary">Cancelar</a>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -63,41 +119,85 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const latInput = document.getElementById('id_latitud');
     const lonInput = document.getElementById('id_longitud');
+    const direccionInput = document.getElementById('id_direccion_texto');
 
     // Coordenadas iniciales (Santiago, Chile) o las de la oferta si se está editando
-    const initialLat = parseFloat(latInput.value) || -33.4489;
-    const initialLon = parseFloat(lonInput.value) || -70.6693;
+    // Si hay coordenadas guardadas, usarlas. Si no, Santiago.
+    const hasSavedCoords = latInput.value && lonInput.value;
+    const initialLat = hasSavedCoords ? parseFloat(latInput.value) : -33.4489;
+    const initialLon = hasSavedCoords ? parseFloat(lonInput.value) : -70.6693;
 
     const map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/streets-v11',
         center: [initialLon, initialLat],
-        zoom: 10
+        zoom: hasSavedCoords ? 14 : 10
     });
+
+    // Agregar control de navegación
+    map.addControl(new mapboxgl.NavigationControl());
+
+    // Agregar geocodificador
+    const geocoder = new MapboxGeocoder({
+        accessToken: mapboxgl.accessToken,
+        mapboxgl: mapboxgl,
+        marker: false, // Manejaremos el marcador nosotros mismos
+        placeholder: 'Buscar dirección...',
+        countries: 'cl' // Limitar búsqueda a Chile (opcional, pero recomendado para este contexto)
+    });
+
+    map.addControl(geocoder);
 
     let marker = null;
 
+    // Función para actualizar marcador y campos
+    function updateLocation(lng, lat, address) {
+        // Actualizar campos ocultos
+        latInput.value = lat;
+        lonInput.value = lng;
+        
+        // Si tenemos una dirección (del geocodificador), actualizar el campo de texto
+        if (address) {
+            direccionInput.value = address;
+        }
+
+        // Mover o crear marcador
+        if (marker) {
+            marker.setLngLat([lng, lat]);
+        } else {
+            marker = new mapboxgl.Marker()
+                .setLngLat([lng, lat])
+                .addTo(map);
+        }
+        
+        // Centrar mapa
+        map.flyTo({
+            center: [lng, lat],
+            zoom: 14
+        });
+    }
+
     // Si ya hay coordenadas, colocar un marcador inicial
-    if (latInput.value && lonInput.value) {
+    if (hasSavedCoords) {
         marker = new mapboxgl.Marker()
             .setLngLat([initialLon, initialLat])
             .addTo(map);
     }
 
+    // Evento de resultado del geocodificador
+    geocoder.on('result', function(e) {
+        const coords = e.result.center; // [lng, lat]
+        const address = e.result.place_name;
+        updateLocation(coords[0], coords[1], address);
+    });
+
     // Evento de clic en el mapa
     map.on('click', function (e) {
         const coords = e.lngLat;
-        
-        // Actualizar los campos ocultos del formulario
-        latInput.value = coords.lat;
-        lonInput.value = coords.lng;
-
-        // Mover el marcador o crearlo si no existe
-        if (marker) {
-            marker.setLngLat(coords);
-        } else {
-            marker = new mapboxgl.Marker().setLngLat(coords).addTo(map);
-        }
+        // Al hacer clic, no tenemos la dirección en texto automáticamente, 
+        // pero podríamos hacer reverse geocoding si fuera crítico. 
+        // Por ahora mantenemos la dirección que estaba o dejamos que el usuario la edite.
+        updateLocation(coords.lng, coords.lat, null);
     });
 });
 </script>
