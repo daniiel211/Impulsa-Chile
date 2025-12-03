@@ -71,6 +71,8 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'http'
+
 
 
 
@@ -121,12 +123,31 @@ WSGI_APPLICATION = 'EvES2.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': dj_database_url.config(
+# Database
+# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+
+DATABASES = {}
+try:
+    # Intenta configurar la base de datos usando la variable de entorno DATABASE_URL
+    database_config = dj_database_url.config(
         default='sqlite:///db.sqlite3',
         conn_max_age=600
     )
-}
+    DATABASES['default'] = database_config
+
+    # Fix for local development with Railway internal URL
+    # If we are trying to connect to the internal Railway network from outside (e.g. localhost),
+    # it will fail. In this case, we fallback to SQLite.
+    if 'postgres.railway.internal' in str(DATABASES['default'].get('HOST', '')):
+        print("WARNING: Detected internal Railway URL on local machine. Falling back to SQLite.")
+        raise Exception("Internal Railway URL not accessible locally")
+
+except Exception as e:
+    print(f"WARNING: Could not configure database from URL ({e}). Falling back to SQLite.")
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 
 
 # Password validation
