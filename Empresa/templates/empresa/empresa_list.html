@@ -23,9 +23,6 @@
       </div>
     </div>
 
-    <!-- (Se removió el bloque de descripción larga aquí para dejarla fuera de la tarjeta, arriba) -->
-    </div>
-
     <!-- Empresas destacadas (precargadas) -->
     <div class="col-12">
       <div class="card shadow-sm">
@@ -63,23 +60,73 @@
       </div>
     </div>
 
-    <div class="col-12">
+    <!-- Otras empresas registradas (Grid) -->
+    <div class="col-12 mt-4">
+      <h2 class="h6 mb-3">Otras empresas registradas</h2>
       {% if empresas %}
-        <ul class="list-group">
-          {% for empresa in empresas %}
-          <li class="list-group-item d-flex justify-content-between align-items-center">
-            <a href="{% url 'empresa-detail' empresa.pk %}" class="fw-semibold">{{ empresa.razon_social }}</a>
-            {% if user.is_authenticated %}
-              <span class="text-nowrap">
-                <a href="{% url 'empresa-update' empresa.pk %}" class="btn btn-sm btn-outline-primary">Editar</a>
-                <a href="{% url 'empresa-delete' empresa.pk %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
-              </span>
-            {% endif %}
-          </li>
-          {% endfor %}
-        </ul>
+      <div class="row g-3">
+        {% for empresa in empresas %}
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 card-hover border-0 shadow-sm">
+            <div class="card-body d-flex flex-column">
+              <div class="d-flex align-items-start justify-content-between mb-2">
+                <h5 class="card-title h6 fw-bold mb-0 text-truncate" title="{{ empresa.razon_social }}">
+                  {{ empresa.razon_social }}
+                </h5>
+                {% if empresa.industria %}
+                  <span class="badge text-bg-primary">{{ empresa.industria.nombre_industria }}</span>
+                {% else %}
+                  <span class="badge text-bg-secondary">General</span>
+                {% endif %}
+              </div>
+
+              <p class="card-text small text-muted mb-3" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                {{ empresa.descripcion|default:"Sin descripción disponible." }}
+              </p>
+
+              <div class="small mb-3 text-muted">
+                <i class="bi bi-geo-alt me-1"></i>{{ empresa.ubicacion_texto|default:"Chile" }}
+                {% if empresa.tamano_rango %}
+                  <span class="mx-1">·</span> {{ empresa.tamano_rango }}
+                {% endif %}
+              </div>
+
+              {% if empresa.razones_list %}
+              <div class="small fw-semibold mb-1">Por qué elegirla</div>
+              <ul class="small text-muted mb-3 ps-3">
+                {% for reason in empresa.razones_list|slice:":3" %}
+                  <li>{{ reason }}</li>
+                {% endfor %}
+              </ul>
+              {% endif %}
+
+              {% if empresa.roles_list %}
+              <div class="d-flex flex-wrap gap-1 mb-3">
+                {% for r in empresa.roles_list|slice:":4" %}
+                  <span class="badge rounded-pill text-bg-light border">{{ r }}</span>
+                {% endfor %}
+              </div>
+              {% endif %}
+
+              <div class="mt-auto d-flex justify-content-between align-items-center pt-2 border-top">
+                <a href="{% url 'empresa-detail' empresa.pk %}" class="btn btn-outline-primary btn-sm">Conocer más</a>
+                
+                {% if user == empresa.usuario %}
+                  <div>
+                    <a href="{% url 'empresa-update' empresa.pk %}" class="text-primary me-2" title="Editar"><i class="bi bi-pencil-square"></i></a>
+                    <a href="{% url 'empresa-delete' empresa.pk %}" class="text-danger" title="Eliminar"><i class="bi bi-trash"></i></a>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
       {% else %}
-        <div class="alert alert-light border">No hay empresas registradas aún. Revisa las destacadas y usa la búsqueda para encontrar opciones.</div>
+        <div class="alert alert-light border">
+          No hay empresas registradas que coincidan con tu búsqueda.
+        </div>
       {% endif %}
     </div>
   </div>

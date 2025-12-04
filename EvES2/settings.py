@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'Empresa',
     'Usuario',
     'Oferta_Empleo',
+    'rest_framework',
 ]
 
 SITE_ID = 1

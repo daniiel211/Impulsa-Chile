@@ -21,6 +21,18 @@ class Empresa(models.Model):
     def __str__(self):
         return self.razon_social
 
+    @property
+    def razones_list(self):
+        if not self.por_que_elegirla:
+            return []
+        return [r.strip() for r in self.por_que_elegirla.splitlines() if r.strip()]
+
+    @property
+    def roles_list(self):
+        if not self.roles_clave:
+            return []
+        return [r.strip() for r in self.roles_clave.split(',') if r.strip()]
+
     class Meta:
         verbose_name = "Empresa"
         verbose_name_plural = "Empresas"

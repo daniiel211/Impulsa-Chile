@@ -6,6 +6,24 @@
 <div class="container mt-4">
     <h1 class="mb-4">Mapa de Ofertas de Empleo</h1>
 
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-5">
+                    <label for="q" class="form-label visually-hidden">Cargo o palabra clave</label>
+                    <input type="text" class="form-control" id="q" name="q" placeholder="Ej: Desarrollador, Vendedor..." value="{{ busqueda_q }}">
+                </div>
+                <div class="col-md-5">
+                    <label for="ub" class="form-label visually-hidden">Ubicación</label>
+                    <input type="text" class="form-control" id="ub" name="ub" placeholder="Ej: Santiago, Valparaíso..." value="{{ busqueda_ub }}">
+                </div>
+                <div class="col-md-2 d-grid">
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Buscar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Incluir Mapbox GL JS y CSS -->
     <script src='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js'></script>
     <link href='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css' rel='stylesheet' />
@@ -17,6 +35,7 @@
         const mapboxAccessToken = "{{ mapbox_access_token }}";
         // Parseamos el JSON de ofertas que viene serializado desde la vista
         const ofertasData = JSON.parse('{{ ofertas_json|escapejs }}');
+        const ofertasJoobleData = JSON.parse('{{ ofertas_jooble_json|escapejs }}');
 
         mapboxgl.accessToken = mapboxAccessToken;
         const map = new mapboxgl.Map({
@@ -29,30 +48,65 @@
         // Añadir controles de navegación (zoom, rotación)
         map.addControl(new mapboxgl.NavigationControl());
 
-        // Iterar sobre cada oferta y añadir un marcador al mapa
+        // 1. Mostrar Ofertas Internas (Marcadores Azules por defecto)
         ofertasData.forEach(oferta => {
             const { pk, fields } = oferta;
             const { titulo, latitud, longitud, direccion_texto } = fields;
 
             if (latitud && longitud) {
-                // Crear el contenido del popup
                 const popupContent = `
                     <div>
-                        <h5>${titulo}</h5>
-                        <p>${direccion_texto || 'Dirección no especificada'}</p>
+                        <h6>${titulo}</h6>
+                        <p class="small text-muted mb-1">${direccion_texto || 'Dirección no especificada'}</p>
+                        <span class="badge bg-primary mb-2">Impulsa Chile</span>
+                        <br>
                         <a href="/ofertas/${pk}/" class="btn btn-sm btn-primary">Ver detalle</a>
                     </div>
                 `;
 
-                // Crear un popup
-                const popup = new mapboxgl.Popup({ offset: 25 })
-                    .setHTML(popupContent);
+                const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(popupContent);
 
-                // Crear un marcador para la oferta y añadirlo al mapa
-                new mapboxgl.Marker()
+                new mapboxgl.Marker() // Azul por defecto
                     .setLngLat([longitud, latitud])
-                    .setPopup(popup) // Asignar el popup al marcador
+                    .setPopup(popup)
                     .addTo(map);
+            }
+        });
+
+        // 2. Mostrar Ofertas de Jooble (Geocodificación Cliente - Marcadores Rojos)
+        // Limitamos para no saturar la API de geocodificación
+        ofertasJoobleData.slice(0, 10).forEach(async (oferta) => {
+            const locationName = oferta.location && oferta.location.display_name ? oferta.location.display_name : 'Chile';
+            
+            // Si la ubicación es muy genérica ("Chile"), quizás no queramos mostrarla o la mostramos en el centro
+            // Intentamos geocodificar
+            try {
+                const response = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(locationName)}.json?access_token=${mapboxAccessToken}&country=cl&limit=1`);
+                const data = await response.json();
+
+                if (data.features && data.features.length > 0) {
+                    const [lng, lat] = data.features[0].center;
+
+                    const popupContent = `
+                        <div>
+                            <h6>${oferta.title}</h6>
+                            <p class="small text-muted mb-1">${oferta.company.display_name} - ${locationName}</p>
+                            <span class="badge bg-warning text-dark mb-2">Jooble</span>
+                            <br>
+                            <a href="${oferta.redirect_url}" target="_blank" class="btn btn-sm btn-outline-dark">Ver en Jooble</a>
+                        </div>
+                    `;
+
+                    const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(popupContent);
+
+                    // Marcador Rojo para diferenciar
+                    new mapboxgl.Marker({ color: '#ef4444' }) 
+                        .setLngLat([lng, lat])
+                        .setPopup(popup)
+                        .addTo(map);
+                }
+            } catch (error) {
+                console.error("Error geocodificando oferta Jooble:", error);
             }
         });
     </script>

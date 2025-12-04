@@ -9,6 +9,14 @@ from .views import (
     dashboard_ofertas_view,
     buscar_empleos,
 )
+from django.urls import include
+from rest_framework.routers import DefaultRouter
+from .api_views import OfertaEmpleoViewSet, RegionViewSet, TipoContratoViewSet
+
+router = DefaultRouter()
+router.register(r'ofertas', OfertaEmpleoViewSet)
+router.register(r'regiones', RegionViewSet)
+router.register(r'tipos-contrato', TipoContratoViewSet)
 
 urlpatterns = [
     # Rutas para vistas generales y de creación
@@ -21,4 +29,7 @@ urlpatterns = [
     path('<int:pk>/', OfertaEmpleoDetailView.as_view(), name='ofertaempleo-detail'),
     path('<int:pk>/editar/', OfertaEmpleoUpdateView.as_view(), name='ofertaempleo-update'),
     path('<int:pk>/eliminar/', OfertaEmpleoDeleteView.as_view(), name='ofertaempleo-delete'),
+    
+    # API REST
+    path('api/', include(router.urls)),
 ]

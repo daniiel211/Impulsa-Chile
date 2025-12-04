@@ -1,68 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{% if object %}Editar Oferta de Empleo{% else %}Crear Nueva Oferta de Empleo{% endif %}{% endblock %}
-
-{% block extra_head %}
-<!-- Mapbox GL JS -->
-<script src='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js'></script>
-<link href='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css' rel='stylesheet' />
-<style>
-    #map {
-        height: 400px;
-        width: 100%;
-        border-radius: 8px;
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card">
-                <div class="card-header">
-                    <h2>{% if object %}Editar Oferta de Empleo{% else %}Crear Nueva Oferta de Empleo{% endif %}</h2>
-                </div>
-                <div class="card-body">
-                    <form method="post">
-                        {% csrf_token %}
-                        
-                        <!-- Campos visibles del formulario -->
-                        <div class="mb-3">{{ form.titulo.label_tag }} {{ form.titulo }}</div>
-                        <div class="mb-3">{{ form.descripcion.label_tag }} {{ form.descripcion }}</div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">{{ form.region.label_tag }} {{ form.region }}</div>
-                            <div class="col-md-6 mb-3">{{ form.tipo_contrato.label_tag }} {{ form.tipo_contrato }}</div>
-                        </div>
-                        <div class="mb-3">{{ form.estado.label_tag }} {{ form.estado }}</div>
-                        <div class="mb-3">{{ form.direccion_texto.label_tag }} {{ form.direccion_texto }}</div>
-                        
-                        <div class="mb-3">{{ form.url_postulacion_externa.label_tag }} {{ form.url_postulacion_externa }}</div>
-                        <div class="mb-3 form-check">
-                            {{ form.es_externa }}
-                            <label class="form-check-label" for="{{ form.es_externa.id_for_label }}">
-                                {{ form.es_externa.label }}
-                            </label>
-                        </div>
-                        <div class="mb-3">{{ form.id_externo_adzuna.label_tag }} {{ form.id_externo_adzuna }}</div>
-
-                        <!-- Campos ocultos para latitud y longitud -->
-                        {{ form.latitud }}
-                        {{ form.longitud }}
-
-                        <!-- Mapa interactivo -->
-                        <div class="mb-3">
-                            <label for="map" class="form-label">Selecciona la ubicación en el mapa</label>
-                            <div id="map"></div>
-                            <small class="form-text text-muted">Haz clic en el mapa para establecer la ubicación exacta de la oferta.</small>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary">Guardar Oferta</button>
-                        <a href="{% url 'empresa-dashboard' %}" class="btn btn-secondary">Cancelar</a>
-                    </form>
-{% extends 'base.html' %}
-
-{% block title %}{% if object %}Editar Oferta de Empleo{% else %}Crear Nueva Oferta de Empleo{% endif %}{% endblock %}
+{% if object %}Editar Oferta de Empleo{% else %}Crear Nueva Oferta de Empleo{% endif %}
 
 {% block extra_head %}
 <!-- Mapbox GL JS -->
@@ -111,7 +49,7 @@
                         </div>
 
                         <button type="submit" class="btn btn-primary">Guardar Oferta</button>
-                        <a href="{% url 'empresa-dashboard' %}" class="btn btn-secondary">Cancelar</a>
+                        <a href="{% url 'ofertaempleo-dashboard' %}" class="btn btn-secondary">Cancelar</a>
                     </form>
                 </div>
             </div>

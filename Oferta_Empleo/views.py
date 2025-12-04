@@ -310,15 +310,29 @@ class OfertaEmpleoDeleteView(LoginRequiredMixin, DeleteView):
         return qs.filter(empresa__usuario=self.request.user)
 
 def mapa_ofertas_view(request):
-    # Obtener todas las ofertas que tienen coordenadas válidas
+    # Obtener todas las ofertas que tienen coordenadas válidas (Internas)
     ofertas = OfertaEmpleo.objects.exclude(latitud__isnull=True).exclude(longitud__isnull=True)
     
     # Serializar los datos para pasarlos a JSON de forma segura
     ofertas_json = serialize('json', ofertas, fields=('pk', 'titulo', 'latitud', 'longitud', 'direccion_texto'))
 
+    # Obtener ofertas de Jooble (Externas)
+    # Recibimos parámetros GET para búsqueda dinámica
+    query = request.GET.get('q', 'empleo')
+    ubicacion = request.GET.get('ub', 'Chile')
+    
+    ofertas_jooble = buscar_ofertas_jooble(keywords=query, location=ubicacion)
+    
+    # Pasamos las ofertas de Jooble como JSON
+    import json
+    ofertas_jooble_json = json.dumps(ofertas_jooble)
+
     context = {
         'mapbox_access_token': settings.MAPBOX_ACCESS_TOKEN,
         'ofertas_json': ofertas_json,
+        'ofertas_jooble_json': ofertas_jooble_json,
+        'busqueda_q': query if query != 'empleo' else '',
+        'busqueda_ub': ubicacion if ubicacion != 'Chile' else '',
     }
     return render(request, 'oferta_empleo/mapa_ofertas.html', context)
 
