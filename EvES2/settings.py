@@ -29,7 +29,7 @@ GOOGLE_CLIENT_ID = config('GOOGLE_CLIENT_ID', default=None)
 ADZUNA_APP_ID = os.environ.get('ADZUNA_APP_ID')
 ADZUNA_APP_KEY = os.environ.get('ADZUNA_APP_KEY')
 # --- Jooble API ---
-JOOBLE_API_KEY = os.environ.get('JOOBLE_API_KEY')
+JOOBLE_API_KEY = config('JOOBLE_API_KEY', default=None)
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
