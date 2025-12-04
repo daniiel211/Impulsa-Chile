@@ -16,11 +16,47 @@
             </a>
             {% if user.is_authenticated %}
                 <a href="{% url 'ofertaempleo-create' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-lg me-2"></i>Publicar Oferta
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Buscador -->
+    <div class="card shadow-sm mb-4 border-0 bg-light">
+        <div class="card-body p-4">
+            <form method="get" action="." class="row g-3">
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" name="q" class="form-control border-start-0 ps-0" placeholder="Cargo, empresa o palabra clave" value="{{ request.GET.q|default:'' }}">
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-geo-alt text-muted"></i></span>
+                        <input type="text" name="ub" class="form-control border-start-0 ps-0" placeholder="Ciudad, región o comuna" value="{{ request.GET.ub|default:'' }}">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Buscar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for oferta in ofertas %}
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 hover-shadow transition-all">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge {% if oferta.estado == 'AB' %}bg-success-subtle text-success{% else %}bg-secondary-subtle text-secondary{% endif %} rounded-pill">
                             {{ oferta.get_estado_display }}
                         </span>
                         
                         {% if oferta.es_externa %}
-                            <span class="badge bg-info text-dark ms-1">Adzuna</span>
+                            <span class="badge bg-info text-dark ms-1">Jooble</span>
                         {% endif %}
 
                         <small class="text-muted">{{ oferta.fecha_publicacion|timesince }}</small>
