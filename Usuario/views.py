@@ -85,6 +85,11 @@ def employeeView(request) :
 class CustomLoginView(LoginView):
     template_name = 'Usuario/login.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['google_client_id'] = settings.GOOGLE_CLIENT_ID
+        return context
+
     def form_valid(self, form):
         # Llama al método original para loguear al usuario
         response = super().form_valid(form)

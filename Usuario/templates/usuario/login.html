@@ -58,9 +58,52 @@
                             <hr class="flex-grow-1">
                         </div>
 
-                        <a href="{% provider_login_url 'google' %}" class="btn btn-outline-secondary w-100">
-                            <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo" width="20" class="me-2"> Ingresar con Google
-                        </a>
+                        <!-- Google Sign-In (GIS) -->
+                        <div id="g_id_onload"
+                             data-client_id="{{ google_client_id }}"
+                             data-callback="handleCredentialResponse"
+                             data-auto_select="false"
+                             data-itp_support="true">
+                        </div>
+                        <div class="g_id_signin"
+                             data-type="standard"
+                             data-shape="rectangular"
+                             data-theme="outline"
+                             data-text="sign_in_with"
+                             data-size="large"
+                             data-logo_alignment="left"
+                             data-width="100%">
+                        </div>
+
+                        <!-- Script para manejar la respuesta de Google -->
+                        <script src="https://accounts.google.com/gsi/client" async defer></script>
+                        <script>
+                            function handleCredentialResponse(response) {
+                                // Enviar el token al backend
+                                fetch("{% url 'google-login' %}", {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRFToken': '{{ csrf_token }}'
+                                    },
+                                    body: JSON.stringify({
+                                        token: response.credential
+                                    })
+                                })
+                                .then(res => res.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        window.location.href = data.redirect_url;
+                                    } else {
+                                        alert('Error al iniciar sesión con Google: ' + (data.error || 'Desconocido'));
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    alert('Error de conexión al intentar iniciar sesión.');
+                                });
+                            }
+                        </script>
                     </form>
                     <p class="text-center mt-3">
                         ¿Aún no tienes una cuenta? <a href="{% url 'trabajador-register' %}">Regístrate</a>
