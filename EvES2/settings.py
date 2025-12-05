@@ -37,7 +37,7 @@ DEBUG = config("DEBUG", default=False, cast=bool)
 MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiZGFuaWllbDIxMSIsImEiOiJjbWluYWU5cmwyOXV1M2twc3QyMDRoOHlyIn0.OElPUaG3hQ9O979kUAYVoA'
 ALLOWED_HOSTS = config('ALLOWED_HOSTS','*', cast=Csv())
 #SECURE_SSL_REDIRECT = True
-CSRF_TRUSTED_ORIGINS = ['https://*.railway.app', 'https://*.up.railway.app']
+CSRF_TRUSTED_ORIGINS = ['https://*.railway.app', 'https://*.up.railway.app', 'https://impulsa-chile.onrender.com']
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
     
