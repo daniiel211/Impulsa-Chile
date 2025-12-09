@@ -11,7 +11,7 @@ from django.views.generic import (
 from .models import Empresa
 from django.http import Http404
 from django.db.models import Q
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 
 FEATURED_SUGGESTIONS = [
     {
@@ -136,7 +136,10 @@ class EmpresaUpdateView(UpdateView):
     template_name = 'empresa/empresa_form.html'
     success_url = reverse_lazy('empresa-list')
 
-class EmpresaDeleteView(DeleteView):
+class EmpresaDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Empresa
     template_name = 'empresa/empresa_confirm_delete.html'
     success_url = reverse_lazy('empresa-list')
+
+    def test_func(self):
+        return not hasattr(self.request.user, 'trabajador')

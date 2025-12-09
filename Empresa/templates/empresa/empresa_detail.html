@@ -100,14 +100,118 @@
       <h1>{{ object.razon_social }}</h1>
       <div class="meta-info">
         <p><strong>RUT:</strong> {{ object.rut }}</p>
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Detalle de {{ object.razon_social }}</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-color: #007bff;
+        --primary-hover-color: #0056b3;
+        --secondary-color: #6c757d;
+        --secondary-hover-color: #5a6268;
+        --danger-color: #dc3545;
+        --danger-hover-color: #c82333;
+        --background-color: #f4f7f6;
+        --container-bg-color: #ffffff;
+        --text-color: #333;
+        --label-color: #555;
+        --border-color: #e9ecef;
+      }
+      body {
+        font-family: "Roboto", sans-serif;
+        margin: 0;
+        background-color: var(--background-color);
+        color: var(--text-color);
+        padding: 2em;
+        box-sizing: border-box;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background-color: var(--container-bg-color);
+        padding: 2.5em;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      }
+      h1 {
+        font-size: 2.5em;
+        font-weight: 700;
+        margin-top: 0;
+        margin-bottom: 1em;
+      }
+      h2 {
+        font-size: 1.25em;
+        font-weight: 700;
+        border-bottom: 2px solid var(--border-color);
+        padding-bottom: 0.5em;
+        margin-top: 2em;
+        margin-bottom: 1em;
+      }
+      .meta-info {
+        background-color: #f8f9fa;
+        padding: 1em;
+        border-radius: 5px;
+        margin-bottom: 2em;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5em;
+      }
+      .meta-info p {
+        margin: 0;
+      }
+      .description {
+        line-height: 1.7;
+        color: var(--label-color);
+      }
+      .actions {
+        margin-top: 2.5em;
+        padding-top: 1.5em;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        gap: 1em;
+      }
+      .btn {
+        text-decoration: none;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-weight: 500;
+        transition: background-color 0.3s;
+        display: inline-block;
+        text-align: center;
+      }
+      .btn-primary { background-color: var(--primary-color); }
+      .btn-primary:hover { background-color: var(--primary-hover-color); }
+      .btn-danger { background-color: var(--danger-color); }
+      .btn-danger:hover { background-color: var(--danger-hover-color); }
+      .btn-secondary { background-color: var(--secondary-color); }
+      .btn-secondary:hover { background-color: var(--secondary-hover-color); }
+      a { color: var(--primary-color); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>{{ object.razon_social }}</h1>
+      <div class="meta-info">
+        <p><strong>RUT:</strong> {{ object.rut }}</p>
         <p><strong>Industria:</strong> {{ object.industria.nombre_industria|default:"No especificada" }}</p>
         <p><strong>Usuario:</strong> {{ object.usuario.username }}</p>
       </div>
       <h2>Descripción</h2>
       <p class="description">{{ object.descripcion|linebreaksbr|default:"Sin descripción." }}</p>
       <div class="actions">
-        <a href="{% url 'empresa-update' object.pk %}" class="btn btn-primary">Editar</a>
-        <a href="{% url 'empresa-delete' object.pk %}" class="btn btn-danger">Eliminar</a>
+        {% if user == object.usuario %}
+          <a href="{% url 'empresa-update' object.pk %}" class="btn btn-primary">Editar</a>
+          <a href="{% url 'empresa-delete' object.pk %}" class="btn btn-danger">Eliminar</a>
+        {% endif %}
         <a href="{% url 'empresa-list' %}" class="btn btn-secondary">Volver al listado</a>
       </div>
     </div>
